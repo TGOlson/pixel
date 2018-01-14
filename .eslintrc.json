@@ -5,9 +5,13 @@
         "jsx-a11y",
         "import"
     ],
+    "env": {
+      "browser": true
+    },
     "rules": {
       "max-len": ["error", { "code": 110 }],
-      "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }]
+      "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+      "no-confusing-arrow": ["error", {"allowParens": true}]
     },
     "parser": "babel-eslint"
 }
