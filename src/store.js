@@ -1,10 +1,12 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
-import thunk from 'redux-thunk';
 import { createLogger } from 'redux-logger';
+import { routerReducer } from 'react-router-redux';
+import thunk from 'redux-thunk';
 
 import pixelcanvas from './reducers/pixelcanvas';
 
 const reducer = combineReducers({
+  routing: routerReducer,
   pixelcanvas,
 });
 

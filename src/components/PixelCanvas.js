@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { event, select } from 'd3-selection';
-import { zoom, zoomIdentity } from 'd3-zoom';
+import { zoom } from 'd3-zoom';
 
 class PixelCanvas extends Component {
   constructor(props) {
@@ -68,7 +68,12 @@ class PixelCanvas extends Component {
   }
 
   initViewportCanvas = () => {
-    const { onZoom, onPixelHover, onPixelSelect } = this.props;
+    const {
+      onZoom,
+      onZoomEnd,
+      onPixelHover,
+      onPixelSelect,
+    } = this.props;
 
     const canvas = select(this.imageCanvas);
 
@@ -77,7 +82,8 @@ class PixelCanvas extends Component {
 
     canvas.call(zoom()
       .scaleExtent([1, 60])
-      .on('zoom', () => onZoom(event.transform)));
+      .on('zoom', () => onZoom(event.transform))
+      .on('end', onZoomEnd));
 
     canvas.on('mousemove', () => {
       const pixel = this.getCurrentPixel();
@@ -243,6 +249,7 @@ PixelCanvas.propTypes = {
   onPixelHover: PropTypes.func.isRequired,
   onPixelSelect: PropTypes.func.isRequired,
   onZoom: PropTypes.func.isRequired,
+  onZoomEnd: PropTypes.func.isRequired,
   imageData: PropTypes.instanceOf(ImageData).isRequired,
   dimensions: PropTypes.arrayOf(PropTypes.number).isRequired,
   transform: PropTypes.shape({

@@ -1,4 +1,7 @@
 import { zoomIdentity } from 'd3-zoom';
+import { LOCATION_CHANGE } from 'react-router-redux';
+import { browserHistory } from 'react-router';
+
 
 const randomInt = max =>
   Math.floor(Math.random() * Math.floor(max));
@@ -76,6 +79,8 @@ const initialState = {
 const pixelEquals = ([x1, y1], [x2, y2]) =>
   x1 === x2 && y1 === y2;
 
+const round = (n, x) => Math.round(x * (10 ** n)) / (10 ** n);
+
 const indexOfWith = (f, x, arr) =>
   arr.reduce((accum, y, index) => (f(x, y) ? index : accum), -1);
 
@@ -86,6 +91,19 @@ export default (state = initialState, { type, payload }) => {
 
     case 'CANVAS_ZOOM':
       return { ...state, transform: payload.transform };
+
+    case 'CANVAS_ZOOM_END': {
+      const { x, y, k } = state.transform;
+      // TODO: these should be the current centered coordinates
+      // /@40,100,1.5
+      const xx = Math.round(x / k);
+      const yy = Math.round(y / k);
+      const kk = round(2, k);
+
+      window.history.replaceState({}, 'foo', `/@${xx},${yy},${kk}`);
+
+      return state;
+    }
 
     case 'SHOW_GRID':
       return { ...state, showGrid: payload.showGrid };
@@ -100,6 +118,23 @@ export default (state = initialState, { type, payload }) => {
         : [...selected, payload.pixel];
 
       return { ...state, selected: newSelected };
+    }
+
+    case LOCATION_CHANGE: {
+      const path = payload.pathname;
+
+      // debugger;
+      if (path.indexOf('/@') >= 0) {
+        const tail = path.slice(2);
+        const tk = tail.split(',');
+        console.log(tk);
+        const transform = state.transform.translate(tk[0], tk[1]).scale(tk[2]);
+
+        return { ...state, transform };
+        // return state;
+      }
+
+      return state;
     }
 
     default: return state;

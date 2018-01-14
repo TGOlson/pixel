@@ -26,10 +26,17 @@ class Home extends Component {
     });
   }
 
+  onCanvasZoomEnd = () => {
+    this.props.dispatch({
+      type: 'CANVAS_ZOOM_END',
+      payload: null,
+    });
+  }
+
   toggleShowGrid = () => {
     this.props.dispatch({
       type: 'SHOW_GRID',
-      payload: { showGrid: !this.props.pixelcanvas.showGrid },
+      payload: { showGrid: !this.props.showGrid },
     });
   }
 
@@ -43,10 +50,6 @@ class Home extends Component {
       showGrid,
       gridZoomLevel,
     } = this.props;
-
-    console.log(this);
-    console.log(this.props);
-    console.log(this.props.location);
 
     const [hoverX, hoverY] = hover;
 
@@ -65,6 +68,7 @@ class Home extends Component {
           onPixelHover={this.onPixelHover}
           onPixelSelect={this.onPixelSelect}
           onZoom={this.onCanvasZoom}
+          onZoomEnd={this.onCanvasZoomEnd}
           showGrid={showGrid}
           gridZoomLevel={gridZoomLevel}
         />

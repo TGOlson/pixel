@@ -20,9 +20,12 @@ module.exports = {
   output: {
     path: `${parentDir}/dist}`,
     filename: 'bundle.js',
+    publicPath: '/',
   },
   devServer: {
     contentBase: parentDir,
-    historyApiFallback: true,
+    historyApiFallback: {
+      disableDotRule: true,
+    },
   },
 };
