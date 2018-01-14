@@ -1,11 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 const About = () => (
-  <div>
-    About
-    <Link href="/#" to="/"><button>Go Home</button></Link>
-  </div>
+  <h1>Learn about Pixel!</h1>
 );
 
 export default About;
