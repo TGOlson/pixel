@@ -2,7 +2,16 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import { withStyles } from 'material-ui/styles';
+import Button from 'material-ui/Button';
+
 import PixelCanvas from '../components/PixelCanvas';
+
+const styles = theme => ({
+  button: {
+    margin: theme.spacing.unit,
+  },
+});
 
 class Home extends Component {
   onPixelHover = (pixel) => {
@@ -48,6 +57,20 @@ class Home extends Component {
     });
   }
 
+  renderSelected = () => {
+    const { selected, dimensions } = this.props;
+
+    return selected.map(([x, y]) => {
+      const id = x + (y * dimensions[0]);
+
+      return (
+        <a key={id} style={{ marginRight: '5px' }} href="/#">
+          {x}x{y}
+        </a>
+      );
+    });
+  }
+
   render() {
     const {
       hover,
@@ -57,17 +80,31 @@ class Home extends Component {
       transform,
       showGrid,
       gridZoomLevel,
+      classes,
     } = this.props;
 
     const [hoverX, hoverY] = hover;
 
+    const containerStyle = {
+      position: 'relative',
+      display: 'flex',
+      height: '100vh',
+    };
+
+    // TODO: add/remove when canvas is hovered
+    const pixelDisplay = (
+      <Button raised color="contrast" className={classes.button} style={{ position: 'absolute' }}>
+        {hoverX}.{hoverY}
+      </Button>
+    );
+
+    // <button onClick={this.toggleShowGrid}>{showGrid ? 'Hide' : 'Show'} grid</button>
+    // <button onClick={this.resetCanvas}>Reset</button>
+    // <p style={{ margin: 0 }}>{selected.length} Pixels selected</p>
+
     return (
-      <div>
-        <button onClick={this.toggleShowGrid}>{showGrid ? 'Hide' : 'Show'} grid</button>
-        <button onClick={this.resetCanvas}>Reset</button>
-        <p style={{ margin: 0 }}>x: {hoverX}</p>
-        <p style={{ margin: 0 }}>y: {hoverY}</p>
-        <p style={{ margin: 0 }}>zoom: {transform.k}</p>
+      <div style={containerStyle}>
+        {hoverX === null ? null : pixelDisplay}
         <PixelCanvas
           hover={hover}
           selected={selected}
@@ -99,6 +136,7 @@ Home.propTypes = {
   }).isRequired,
   showGrid: PropTypes.bool.isRequired,
   gridZoomLevel: PropTypes.number.isRequired,
+  classes: PropTypes.object.isRequired,
 };
 
-export default connect(state => state.pixelcanvas)(Home);
+export default connect(state => ({ classes: state.classes, ...state.pixelcanvas }))(withStyles(styles)(Home));

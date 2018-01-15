@@ -10,6 +10,8 @@ import App from './components/App';
 import Home from './containers/Home';
 import About from './containers/About';
 
+import './styles/index.less';
+
 const history = syncHistoryWithStore(browserHistory, store);
 
 

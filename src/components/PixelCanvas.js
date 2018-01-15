@@ -45,13 +45,6 @@ class PixelCanvas extends Component {
     return [pixelX, pixelY];
   }
 
-  isHoverChange = ({ hover: [nextX, nextY] }) => {
-    const [prevX, prevY] = this.props.hover;
-
-    return nextX !== prevX ||
-           nextY !== prevY;
-  }
-
   isTransformChange = ({ transform }) => {
     const prevTransform = this.props;
 
@@ -238,24 +231,21 @@ class PixelCanvas extends Component {
     const [dimX, dimY] = this.state.viewportDim;
 
     const containerStyle = {
-      position: 'relative',
-      width: dimX,
-      height: dimY,
-      border: '1px solid grey',
+      flex: 1,
     };
 
     const imageCanvasStyle = {
       top: 0,
       left: 0,
       position: 'absolute',
-      zIndex: 0,
+      zIndex: -1,
+      width: '100%',
+      height: '100%',
     };
 
     const interactiveCanvasStyle = {
-      top: 0,
-      left: 0,
-      position: 'absolute',
-      zIndex: 1,
+      ...imageCanvasStyle,
+      zIndex: 0,
     };
 
     return (
@@ -263,8 +253,6 @@ class PixelCanvas extends Component {
         <canvas
           ref={(canvas) => { this.imageCanvas = canvas; }}
           style={imageCanvasStyle}
-          width={dimX}
-          height={dimY}
         />
         <canvas
           ref={(canvas) => { this.interactiveCanvas = canvas; }}
