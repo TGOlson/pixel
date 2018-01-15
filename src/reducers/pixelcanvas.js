@@ -92,6 +92,10 @@ export default (state = initialState, { type, payload }) => {
     case 'CANVAS_ZOOM':
       return { ...state, transform: payload.transform };
 
+    // TODO: canvas needs to be notified
+    // case 'RESET_CANVAS':
+    //   return { ...state, transform: zoomIdentity };
+
     case 'CANVAS_ZOOM_END': {
       const { x, y, k } = state.transform;
       // TODO: these should be the current centered coordinates
@@ -120,22 +124,23 @@ export default (state = initialState, { type, payload }) => {
       return { ...state, selected: newSelected };
     }
 
-    case LOCATION_CHANGE: {
-      const path = payload.pathname;
-
-      // debugger;
-      if (path.indexOf('/@') >= 0) {
-        const tail = path.slice(2);
-        const tk = tail.split(',');
-        console.log(tk);
-        const transform = state.transform.translate(tk[0], tk[1]).scale(tk[2]);
-
-        return { ...state, transform };
-        // return state;
-      }
-
-      return state;
-    }
+    // TODO: not correct, needs to parse centered pixel
+    // case LOCATION_CHANGE: {
+    //   const path = payload.pathname;
+    //
+    //   // debugger;
+    //   if (path.indexOf('/@') >= 0) {
+    //     const tail = path.slice(2);
+    //     const tk = tail.split(',');
+    //     console.log(tk);
+    //     const transform = state.transform.translate(tk[0], tk[1]).scale(tk[2]);
+    //
+    //     return { ...state, transform };
+    //     // return state;
+    //   }
+    //
+    //   return state;
+    // }
 
     default: return state;
   }

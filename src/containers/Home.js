@@ -33,6 +33,14 @@ class Home extends Component {
     });
   }
 
+  resetCanvas = () => {
+    throw new Error('cannot reset');
+    // this.props.dispatch({
+    //   type: 'RESET_CANVAS',
+    //   payload: null,
+    // });
+  }
+
   toggleShowGrid = () => {
     this.props.dispatch({
       type: 'SHOW_GRID',
@@ -56,6 +64,7 @@ class Home extends Component {
     return (
       <div>
         <button onClick={this.toggleShowGrid}>{showGrid ? 'Hide' : 'Show'} grid</button>
+        <button onClick={this.resetCanvas}>Reset</button>
         <p style={{ margin: 0 }}>x: {hoverX}</p>
         <p style={{ margin: 0 }}>y: {hoverY}</p>
         <p style={{ margin: 0 }}>zoom: {transform.k}</p>

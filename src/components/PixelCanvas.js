@@ -14,12 +14,13 @@ class PixelCanvas extends Component {
 
   componentDidMount() {
     this.initOffscreenCanvas();
-    this.initViewportCanvas();
-    this.renderViewport();
+    this.initImageCanvas();
+    this.initInteractiveCanvas();
+    this.renderCanvases();
   }
 
-  componentDidUpdate() {
-    this.renderViewport();
+  componentDidUpdate(prevProps) {
+    this.renderCanvases(prevProps);
   }
 
   // Note: this can only be called with a d3 event handler
@@ -51,10 +52,12 @@ class PixelCanvas extends Component {
            nextY !== prevY;
   }
 
-  shouldRenderGrid = () => {
-    const { showGrid, gridZoomLevel, transform } = this.props;
+  isTransformChange = ({ transform }) => {
+    const prevTransform = this.props;
 
-    return showGrid && transform.k >= gridZoomLevel;
+    return transform.x !== prevTransform.x ||
+           transform.y !== prevTransform.y ||
+           transform.k !== prevTransform.k;
   }
 
   initOffscreenCanvas = () => {
@@ -67,36 +70,11 @@ class PixelCanvas extends Component {
     this.offscreenContext = this.offscreenCanvas.getContext('2d');
   }
 
-  initViewportCanvas = () => {
-    const {
-      onZoom,
-      onZoomEnd,
-      onPixelHover,
-      onPixelSelect,
-    } = this.props;
-
+  initImageCanvas = () => {
     const canvas = select(this.imageCanvas);
 
     // reset zoom to any previous value
     canvas.call(zoom().transform, this.props.transform);
-
-    canvas.call(zoom()
-      .scaleExtent([1, 60])
-      .on('zoom', () => onZoom(event.transform))
-      .on('end', onZoomEnd));
-
-    canvas.on('mousemove', () => {
-      const pixel = this.getCurrentPixel();
-
-      if (this.isHoverChange({ hover: pixel })) {
-        onPixelHover(pixel);
-      }
-    });
-
-    canvas.on('click', () => {
-      const pixel = this.getCurrentPixel();
-      onPixelSelect(pixel);
-    });
 
     const [dimX, dimY] = this.state.viewportDim;
     this.imageContext = canvas.node().getContext('2d');
@@ -110,27 +88,62 @@ class PixelCanvas extends Component {
     this.imageContext.msImageSmoothingEnabled = false;
   }
 
-  renderViewport = () => {
-    // TODO: consider adding back optimization checks
-    // we don't always need to render everything on every prop change
-    // if (this.isHoverChange(nextProps)) {
-    // if (this.isTransformChange(nextProps)) {
+  initInteractiveCanvas = () => {
+    const {
+      onZoom,
+      onZoomEnd,
+      onPixelHover,
+      onPixelSelect,
+      hover,
+    } = this.props;
 
+    const canvas = select(this.interactiveCanvas);
+
+    // reset zoom to any previous value
+    canvas.call(zoom().transform, this.props.transform);
+
+    canvas.call(zoom()
+      .scaleExtent([1, 60])
+      .on('zoom', () => onZoom(event.transform))
+      .on('end', onZoomEnd));
+
+    canvas.on('mousemove', () => {
+      const pixel = this.getCurrentPixel();
+
+      const isHoverChange =
+        pixel[0] !== hover[0] ||
+        pixel[1] !== hover[1];
+
+      return isHoverChange ? onPixelHover(pixel) : null;
+    });
+
+    canvas.on('click', () => onPixelSelect(this.getCurrentPixel()));
+
+    this.interactiveContext = canvas.node().getContext('2d');
+    this.interactiveContext.imageSmoothingEnabled = false;
+    this.interactiveContext.mozImageSmoothingEnabled = false;
+    this.interactiveContext.webkitImageSmoothingEnabled = false;
+    this.interactiveContext.msImageSmoothingEnabled = false;
+  }
+
+  renderCanvases = (prevProps) => {
     // TODO: debounce to last?
     window.requestAnimationFrame(() => {
-      this.renderCanvas();
-      this.renderSelected();
-
-      // TODO: should hover be disabled until 2x zoom?
-      this.renderHover();
-
-      if (this.shouldRenderGrid()) {
-        this.renderGrid();
+      // Note: only re-render the image canvas on transform changes
+      // otherwise the changes only impact the interactive canvas
+      // and re-rendering would be unnecessary overhead
+      if (!prevProps || this.isTransformChange(prevProps)) {
+        this.renderImageCanvas();
       }
+
+      // Note: always re-ender the interactive canvas
+      // it's very low cost, and any prop change should trigger
+      // some sort of change on this canvas as well
+      this.renderInteractiveCanvas();
     });
   }
 
-  renderCanvas = () => {
+  renderImageCanvas = () => {
     const {
       dimensions: [imageX, imageY],
       transform: { x, y, k },
@@ -143,6 +156,8 @@ class PixelCanvas extends Component {
     const offsetY = (viewY - imageY) / 2;
 
     // update offscreen canvas
+    // TODO: this won't work once async updates are coming in
+    // May need to update the offscreen canvas continually
     this.offscreenContext.putImageData(imageData, 0, 0);
 
     // update viewport
@@ -157,87 +172,107 @@ class PixelCanvas extends Component {
     this.imageContext.restore();
   }
 
-  renderGrid = () => {
-    const { x, y, k } = this.props.transform;
-    const [viewX, viewY] = this.state.viewportDim;
-
-    this.imageContext.fillStyle = 'white';
-
-    const gridWidth = k > 20 ? 2 : 1;
-
-    // TODO: drawing from offsetX to viewX is probably overkill in a lot of cases
-    // it is drawing a grid on the entire viewport
-    // in some cases the image may not fill the entire view port
-    for (let offsetX = x % k; offsetX < viewX; offsetX += k) {
-      this.imageContext.fillRect(offsetX - 1, 0, gridWidth, viewY);
-    }
-
-    for (let offsetY = y % k; offsetY < viewY; offsetY += k) {
-      this.imageContext.fillRect(0, offsetY - 1, viewX, gridWidth);
-    }
-  }
-
-  renderSelected = () => {
+  renderInteractiveCanvas = () => {
     const {
+      hover: [hoverX, hoverY],
       selected,
       transform: { x, y, k },
       dimensions: [imageX, imageY],
+      showGrid,
+      gridZoomLevel,
     } = this.props;
 
+    const context = this.interactiveContext;
     const [viewX, viewY] = this.state.viewportDim;
 
     const offsetX = (viewX - imageX) / 2;
     const offsetY = (viewY - imageY) / 2;
 
-    this.imageContext.save();
+    // clear previous state
+    context.clearRect(0, 0, viewX, viewY);
 
-    this.imageContext.translate(x, y);
-    this.imageContext.scale(k, k);
 
-    this.imageContext.fillStyle = 'blue';
-    // this.imageContext.globalAlpha = '0.4';
+    // translate and render hover/selected
+    context.save();
+
+    context.translate(x, y);
+    context.scale(k, k);
+
+    // render hovered pixels
+    context.fillStyle = 'blue';
+    context.globalAlpha = '0.4';
+    context.fillRect(hoverX + offsetX, hoverY + offsetY, 1, 1);
+
+    // render selected pixels
+    context.fillStyle = 'blue';
+    context.globalAlpha = '1.0';
 
     selected.forEach(([selectedX, selectedY]) => {
-      this.imageContext.fillRect(selectedX + offsetX, selectedY + offsetY, 1, 1);
+      context.fillRect(selectedX + offsetX, selectedY + offsetY, 1, 1);
     });
 
-    this.imageContext.restore();
-  }
+    context.restore();
 
-  renderHover = () => {
-    const {
-      hover: [hoverX, hoverY],
-      transform: { x, y, k },
-      dimensions: [imageX, imageY],
-    } = this.props;
+    // render grid, if necessary
+    if (showGrid && k >= gridZoomLevel) {
+      context.fillStyle = 'white';
 
-    const [viewX, viewY] = this.state.viewportDim;
+      // increase linearly from k=10 to k=20
+      // when k>20 stay contast with 2px grid lines
+      const gridWidth = Math.min(2, 1 + ((k - 10) / 10));
 
-    const offsetX = (viewX - imageX) / 2;
-    const offsetY = (viewY - imageY) / 2;
+      // TODO: drawing from offsetX to viewX is probably overkill in a lot of cases
+      // it is drawing a grid on the entire viewport
+      // in some cases the image may not fill the entire view port
+      for (let diffX = x % k; diffX < viewX; diffX += k) {
+        context.fillRect(diffX - 1, 0, gridWidth, viewY);
+      }
 
-    this.imageContext.save();
-
-    this.imageContext.translate(x, y);
-    this.imageContext.scale(k, k);
-
-    this.imageContext.fillStyle = 'blue';
-    this.imageContext.globalAlpha = '0.4';
-    this.imageContext.fillRect(hoverX + offsetX, hoverY + offsetY, 1, 1);
-
-    this.imageContext.restore();
+      for (let diffY = y % k; diffY < viewY; diffY += k) {
+        context.fillRect(0, diffY - 1, viewX, gridWidth);
+      }
+    }
   }
 
   render() {
     const [dimX, dimY] = this.state.viewportDim;
 
+    const containerStyle = {
+      position: 'relative',
+      width: dimX,
+      height: dimY,
+      border: '1px solid grey',
+    };
+
+    const imageCanvasStyle = {
+      top: 0,
+      left: 0,
+      position: 'absolute',
+      zIndex: 0,
+    };
+
+    const interactiveCanvasStyle = {
+      top: 0,
+      left: 0,
+      position: 'absolute',
+      zIndex: 1,
+    };
+
     return (
-      <canvas
-        ref={(canvas) => { this.imageCanvas = canvas; }}
-        style={{ border: '1px solid grey' }}
-        width={dimX}
-        height={dimY}
-      />
+      <div style={containerStyle}>
+        <canvas
+          ref={(canvas) => { this.imageCanvas = canvas; }}
+          style={imageCanvasStyle}
+          width={dimX}
+          height={dimY}
+        />
+        <canvas
+          ref={(canvas) => { this.interactiveCanvas = canvas; }}
+          style={interactiveCanvasStyle}
+          width={dimX}
+          height={dimY}
+        />
+      </div>
     );
   }
 }
