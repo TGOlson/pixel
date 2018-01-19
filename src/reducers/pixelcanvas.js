@@ -98,7 +98,7 @@ const initialState = {
   // constants, could/should fetch from server
   dimensions: [DIM, DIM],
   imageData,
-  prices: pixels.map(x => x.price),
+  pixels,
 };
 
 const pixelEquals = ([x1, y1], [x2, y2]) =>

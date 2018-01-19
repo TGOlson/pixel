@@ -80,7 +80,7 @@ class Home extends Component {
     const {
       hover: [hoverX, hoverY],
       dimensions: [x],
-      prices,
+      pixels,
       theme,
     } = this.props;
 
@@ -98,6 +98,7 @@ class Home extends Component {
     };
 
     // TODO: should be a util
+    // TODO: should pixel refs like props.hover be the pixel id?
     const id = hoverX + (hoverY * x);
 
     return (
@@ -106,7 +107,7 @@ class Home extends Component {
           {hoverX} x {hoverY}
         </Typography>
         <Typography type="button">
-          ETH {prices[id]}
+          ETH {pixels[id].price}
         </Typography>
       </Paper>
     );
@@ -226,7 +227,7 @@ Home.propTypes = {
   imageData: PropTypes.instanceOf(ImageData).isRequired,
   /* eslint-disable react/forbid-prop-types */
   // prop type validation is too slow for large arrays
-  prices: PropTypes.array.isRequired,
+  pixels: PropTypes.array.isRequired,
   /* eslint-enable  */
   dimensions: PropTypes.arrayOf(PropTypes.number).isRequired,
   transform: PropTypes.shape({

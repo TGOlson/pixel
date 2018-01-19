@@ -7,6 +7,8 @@ import Navbar from '../containers/Navbar';
 
 const theme = createMuiTheme();
 
+window.theme = theme;
+
 const appStyle = {
   height: '100vh',
   display: 'flex',
