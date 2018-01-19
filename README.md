@@ -22,4 +22,4 @@ notes
 * https://material.io/icons/
 * https://github.com/ethereum/EIPs/issues/721
 
-note: this is a private repo. if this project tanks, remember to convert back to public
+note: this is a private repo. if this project tanks, remember to convert back to public repo
