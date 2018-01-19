@@ -16,7 +16,7 @@ const Navbar = () => (
     <AppBar position="static">
       <Toolbar>
         <Typography type="title" component={Link} to="/" color="inherit" style={titleStyle}>
-          (logo) Pixel
+          Pixel
         </Typography>
         <Button component={Link} to="/about" color="contrast">About</Button>
         <Button color="contrast">Login</Button>

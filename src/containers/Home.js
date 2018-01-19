@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import { withTheme } from 'material-ui/styles';
 import Button from 'material-ui/Button';
+import Paper from 'material-ui/Paper';
+import Typography from 'material-ui/Typography';
 import Snackbar from 'material-ui/Snackbar';
 import SettingsIcon from 'material-ui-icons/Settings';
 
@@ -74,7 +77,12 @@ class Home extends Component {
   }
 
   renderPixelDisplay() {
-    const [hoverX, hoverY] = this.props.hover;
+    const {
+      hover: [hoverX, hoverY],
+      dimensions: [x],
+      prices,
+      theme,
+    } = this.props;
 
     if (hoverX === null) return null;
 
@@ -82,12 +90,25 @@ class Home extends Component {
       position: 'absolute',
       zIndex: 1,
       margin: '8px',
+      padding: '8px 24px',
+      backgroundColor: theme.palette.secondary.light,
+      color: theme.palette.secondary.contrastText,
+      minWidth: '140px',
+      textTransform: 'none',
     };
 
+    // TODO: should be a util
+    const id = hoverX + (hoverY * x);
+
     return (
-      <Button raised color="contrast" style={pixelDisplayStyle}>
-        {hoverX}.{hoverY}
-      </Button>
+      <Paper style={pixelDisplayStyle} elevation={4} square>
+        <Typography type="button">
+          {hoverX} x {hoverY}
+        </Typography>
+        <Typography type="button">
+          ETH {prices[id]}
+        </Typography>
+      </Paper>
     );
   }
 
@@ -123,7 +144,7 @@ class Home extends Component {
     const action = (
       <div>
         <Button color="accent" dense onClick={this.onClearSelections}>
-          Clear selections
+          Clear
         </Button>
         <Button color="accent" dense>
           Purchase
@@ -141,6 +162,7 @@ class Home extends Component {
         open={open}
         message={message}
         action={action}
+        SnackbarContentProps={{ style: { flexGrow: 0 } }}
       />
     );
   }
@@ -202,6 +224,10 @@ Home.propTypes = {
   hover: PropTypes.arrayOf(PropTypes.number).isRequired,
   selected: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
   imageData: PropTypes.instanceOf(ImageData).isRequired,
+  /* eslint-disable react/forbid-prop-types */
+  // prop type validation is too slow for large arrays
+  prices: PropTypes.array.isRequired,
+  /* eslint-enable  */
   dimensions: PropTypes.arrayOf(PropTypes.number).isRequired,
   transform: PropTypes.shape({
     x: PropTypes.number,
@@ -215,4 +241,4 @@ Home.propTypes = {
 
 const mapStateToProps = state => state.pixelcanvas;
 
-export default connect(mapStateToProps)(Home);
+export default connect(mapStateToProps)(withTheme()(Home));
