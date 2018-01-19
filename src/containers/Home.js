@@ -101,7 +101,7 @@ class Home extends Component {
     };
 
     return (
-      <Button fab mini onClick={this.openSettings} color="contrast" aria-label="settings" style={settingsStyle}>
+      <Button fab mini onClick={this.openSettings} color="contrast" style={settingsStyle}>
         <SettingsIcon />
       </Button>
     );

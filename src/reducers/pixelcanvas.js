@@ -1,6 +1,5 @@
 import { zoomIdentity } from 'd3-zoom';
-import { LOCATION_CHANGE } from 'react-router-redux';
-import { browserHistory } from 'react-router';
+// import { LOCATION_CHANGE } from 'react-router-redux';
 
 
 const randomInt = max =>
@@ -146,7 +145,8 @@ export default (state = initialState, { type, payload }) => {
     //   return state;
     // }
 
-    case 'SETTINGS_MODAL': return { ...state, settingsOpen: payload.open }
+    case 'SETTINGS_MODAL':
+      return { ...state, settingsOpen: payload.open };
 
     default: return state;
   }
