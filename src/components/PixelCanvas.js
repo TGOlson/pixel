@@ -4,13 +4,13 @@ import { event, select } from 'd3-selection';
 import { zoom } from 'd3-zoom';
 
 class PixelCanvas extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      viewportDim: [800, 600], // TODO: size to window or something
-    };
-  }
+  // constructor(props) {
+  //   super(props);
+  //
+  //   this.state = {
+  //     viewportDim: [800, 799], // TODO: size to window or something
+  //   };
+  // }
 
   componentDidMount() {
     this.initOffscreenCanvas();
@@ -30,7 +30,7 @@ class PixelCanvas extends Component {
       transform: { x, y, k },
     } = this.props;
 
-    const [viewX, viewY] = this.state.viewportDim;
+    const [viewX, viewY] = this.viewportDimensions();
 
     const offsetX = (viewX - imageX) / 2;
     const offsetY = (viewY - imageY) / 2;
@@ -65,20 +65,29 @@ class PixelCanvas extends Component {
 
   initImageCanvas = () => {
     const canvas = select(this.imageCanvas);
+    const [dimX, dimY] = this.viewportDimensions();
+
+    canvas.node().width = dimX;
+    canvas.node().height = dimY;
 
     // reset zoom to any previous value
     canvas.call(zoom().transform, this.props.transform);
 
-    const [dimX, dimY] = this.state.viewportDim;
-    this.imageContext = canvas.node().getContext('2d');
+    const context = canvas.node().getContext('2d');
+    this.imageContext = context;
 
-    this.imageContext.fillStyle = 'white';
-    this.imageContext.fillRect(0, 0, dimX, dimY);
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, dimX, dimY);
 
-    this.imageContext.imageSmoothingEnabled = false;
-    this.imageContext.mozImageSmoothingEnabled = false;
-    this.imageContext.webkitImageSmoothingEnabled = false;
-    this.imageContext.msImageSmoothingEnabled = false;
+    context.imageSmoothingEnabled = false;
+    context.mozImageSmoothingEnabled = false;
+    context.webkitImageSmoothingEnabled = false;
+    context.msImageSmoothingEnabled = false;
+
+    context.shadowColor = '#999';
+    context.shadowBlur = 10;
+    context.shadowOffsetX = 2;
+    context.shadowOffsetY = 2;
   }
 
   initInteractiveCanvas = () => {
@@ -87,21 +96,25 @@ class PixelCanvas extends Component {
       onZoomEnd,
       onPixelHover,
       onPixelSelect,
-      hover,
     } = this.props;
 
     const canvas = select(this.interactiveCanvas);
+    const [dimX, dimY] = this.viewportDimensions();
+
+    canvas.node().width = dimX;
+    canvas.node().height = dimY;
 
     // reset zoom to any previous value
     canvas.call(zoom().transform, this.props.transform);
 
     canvas.call(zoom()
-      .scaleExtent([1, 60])
+      .scaleExtent([0.5, 60])
       .on('zoom', () => onZoom(event.transform))
       .on('end', onZoomEnd));
 
     canvas.on('mousemove', () => {
       const pixel = this.getCurrentPixel();
+      const { hover } = this.props;
 
       const isHoverChange =
         pixel[0] !== hover[0] ||
@@ -118,6 +131,20 @@ class PixelCanvas extends Component {
     this.interactiveContext.webkitImageSmoothingEnabled = false;
     this.interactiveContext.msImageSmoothingEnabled = false;
   }
+
+  viewportDimensions = () => {
+    const isEven = x => x % 2 === 0;
+
+    // TODO: this is a pretty big hack. should move this to state
+    // also, should handle window resize events
+    const dimX = this.imageCanvas.offsetWidth;
+    const dimY = this.imageCanvas.offsetHeight;
+
+    return [
+      isEven(dimX) ? dimX : dimX + 1,
+      isEven(dimY) ? dimY : dimY + 1,
+    ];
+  };
 
   renderCanvases = (prevProps) => {
     // TODO: debounce to last?
@@ -143,7 +170,7 @@ class PixelCanvas extends Component {
       imageData,
     } = this.props;
 
-    const [viewX, viewY] = this.state.viewportDim;
+    const [viewX, viewY] = this.viewportDimensions();
 
     const offsetX = (viewX - imageX) / 2;
     const offsetY = (viewY - imageY) / 2;
@@ -176,14 +203,13 @@ class PixelCanvas extends Component {
     } = this.props;
 
     const context = this.interactiveContext;
-    const [viewX, viewY] = this.state.viewportDim;
+    const [viewX, viewY] = this.viewportDimensions();
 
     const offsetX = (viewX - imageX) / 2;
     const offsetY = (viewY - imageY) / 2;
 
     // clear previous state
     context.clearRect(0, 0, viewX, viewY);
-
 
     // translate and render hover/selected
     context.save();
@@ -212,26 +238,32 @@ class PixelCanvas extends Component {
 
       // increase linearly from k=10 to k=20
       // when k>20 stay contast with 2px grid lines
-      const gridWidth = Math.min(2, 1 + ((k - 10) / 10));
+      const lineWidth = Math.min(2, 1 + ((k - 10) / 10));
 
       // TODO: drawing from offsetX to viewX is probably overkill in a lot of cases
       // it is drawing a grid on the entire viewport
       // in some cases the image may not fill the entire view port
+      // console.log(offsetY, y, k, y / k, y % k);
+      // console.log(offsetY, y / k, (offsetY * k) + y);
+      const startY = Math.max(0, (offsetY * k) + y);
+      // const endY = (offsetY * k) + y > 0 ? 0 : Math.abs((offsetY * k) + y);
+
+      // console.log(offsetY, y, k, (offsetY * k) + y);
+      // console.log(startY, endY);
       for (let diffX = x % k; diffX < viewX; diffX += k) {
-        context.fillRect(diffX - 1, 0, gridWidth, viewY);
+        context.fillRect(diffX - 1, startY, lineWidth, viewY);
       }
 
       for (let diffY = y % k; diffY < viewY; diffY += k) {
-        context.fillRect(0, diffY - 1, viewX, gridWidth);
+        context.fillRect(0, diffY - 1, viewX, lineWidth);
       }
     }
   }
 
   render() {
-    const [dimX, dimY] = this.state.viewportDim;
-
     const containerStyle = {
       flex: 1,
+      position: 'relative',
     };
 
     const imageCanvasStyle = {
@@ -257,8 +289,6 @@ class PixelCanvas extends Component {
         <canvas
           ref={(canvas) => { this.interactiveCanvas = canvas; }}
           style={interactiveCanvasStyle}
-          width={dimX}
-          height={dimY}
         />
       </div>
     );

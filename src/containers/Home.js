@@ -2,60 +2,62 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { withStyles } from 'material-ui/styles';
 import Button from 'material-ui/Button';
+import Snackbar from 'material-ui/Snackbar';
+import SettingsIcon from 'material-ui-icons/Settings';
 
 import PixelCanvas from '../components/PixelCanvas';
-
-const styles = theme => ({
-  button: {
-    margin: theme.spacing.unit,
-  },
-});
+import Settings from '../components/Settings';
 
 class Home extends Component {
-  onPixelHover = (pixel) => {
+  onPixelHover = pixel =>
     this.props.dispatch({
       type: 'PIXEL_HOVER',
       payload: { pixel },
     });
-  }
 
-  onPixelSelect = (pixel) => {
+  onPixelSelect = pixel =>
     this.props.dispatch({
       type: 'PIXEL_SELECT',
       payload: { pixel },
     });
-  }
 
-  onCanvasZoom = (transform) => {
+  onClearSelections = pixel =>
+    this.props.dispatch({
+      type: 'CLEAR_SELECT',
+      payload: { pixel },
+    });
+
+  onCanvasZoom = transform =>
     this.props.dispatch({
       type: 'CANVAS_ZOOM',
       payload: { transform },
     });
-  }
 
-  onCanvasZoomEnd = () => {
+  onCanvasZoomEnd = () =>
     this.props.dispatch({
       type: 'CANVAS_ZOOM_END',
       payload: null,
     });
-  }
 
-  resetCanvas = () => {
-    throw new Error('cannot reset');
-    // this.props.dispatch({
-    //   type: 'RESET_CANVAS',
-    //   payload: null,
-    // });
-  }
-
-  toggleShowGrid = () => {
+  onShowGridChange = showGrid =>
     this.props.dispatch({
       type: 'SHOW_GRID',
-      payload: { showGrid: !this.props.showGrid },
+      payload: { showGrid },
     });
-  }
+
+  openSettings = () =>
+    this.props.dispatch({
+      type: 'SETTINGS_MODAL',
+      payload: { open: true },
+    });
+
+  closeSettings = () =>
+    this.props.dispatch({
+      type: 'SETTINGS_MODAL',
+      payload: { open: false },
+    });
+
 
   renderSelected = () => {
     const { selected, dimensions } = this.props;
@@ -71,6 +73,78 @@ class Home extends Component {
     });
   }
 
+  renderPixelDisplay() {
+    const [hoverX, hoverY] = this.props.hover;
+
+    if (hoverX === null) return null;
+
+    const pixelDisplayStyle = {
+      position: 'absolute',
+      zIndex: 1,
+      margin: '8px',
+    };
+
+    return (
+      <Button raised color="contrast" style={pixelDisplayStyle}>
+        {hoverX}.{hoverY}
+      </Button>
+    );
+  }
+
+  renderSettings = () => {
+    const settingsStyle = {
+      position: 'absolute',
+      zIndex: 1,
+      right: 0,
+      bottom: 0,
+      margin: '8px',
+    };
+
+    return (
+      <Button fab mini onClick={this.openSettings} color="contrast" aria-label="settings" style={settingsStyle}>
+        <SettingsIcon />
+      </Button>
+    );
+  }
+
+  renderSelected = () => {
+    const { selected } = this.props;
+
+    const open = selected.length !== 0;
+
+    const selectedStyle = {
+      position: 'absolute',
+      margin: '8px',
+      top: 0,
+      right: 0,
+      zIndex: 1,
+    };
+
+    const action = (
+      <div>
+        <Button color="accent" dense onClick={this.onClearSelections}>
+          Clear selections
+        </Button>
+        <Button color="accent" dense>
+          Purchase
+        </Button>
+      </div>
+    );
+
+    const n = selected.length;
+    const message = `${n} Pixel${n === 1 ? '' : 's'} selected!`;
+
+    return (
+      <Snackbar
+        style={selectedStyle}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        open={open}
+        message={message}
+        action={action}
+      />
+    );
+  }
+
   render() {
     const {
       hover,
@@ -80,31 +154,31 @@ class Home extends Component {
       transform,
       showGrid,
       gridZoomLevel,
-      classes,
+      settingsOpen,
     } = this.props;
 
-    const [hoverX, hoverY] = hover;
-
     const containerStyle = {
-      position: 'relative',
       display: 'flex',
-      height: '100vh',
+      flexDirection: 'column',
+      flex: 1,
+      position: 'relative',
     };
 
-    // TODO: add/remove when canvas is hovered
-    const pixelDisplay = (
-      <Button raised color="contrast" className={classes.button} style={{ position: 'absolute' }}>
-        {hoverX}.{hoverY}
-      </Button>
-    );
-
-    // <button onClick={this.toggleShowGrid}>{showGrid ? 'Hide' : 'Show'} grid</button>
-    // <button onClick={this.resetCanvas}>Reset</button>
-    // <p style={{ margin: 0 }}>{selected.length} Pixels selected</p>
+    const pixelDisplay = this.renderPixelDisplay();
+    const settings = this.renderSettings();
+    const selectedDisplay = this.renderSelected();
 
     return (
       <div style={containerStyle}>
-        {hoverX === null ? null : pixelDisplay}
+        {selectedDisplay}
+        {pixelDisplay}
+        {settings}
+        <Settings
+          open={settingsOpen}
+          onClose={this.closeSettings}
+          showGrid={showGrid}
+          onShowGridChange={this.onShowGridChange}
+        />
         <PixelCanvas
           hover={hover}
           selected={selected}
@@ -136,7 +210,9 @@ Home.propTypes = {
   }).isRequired,
   showGrid: PropTypes.bool.isRequired,
   gridZoomLevel: PropTypes.number.isRequired,
-  classes: PropTypes.object.isRequired,
+  settingsOpen: PropTypes.bool.isRequired,
 };
 
-export default connect(state => ({ classes: state.classes, ...state.pixelcanvas }))(withStyles(styles)(Home));
+const mapStateToProps = state => state.pixelcanvas;
+
+export default connect(mapStateToProps)(Home);

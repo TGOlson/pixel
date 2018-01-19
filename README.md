@@ -1,1 +1,7 @@
-like pixel 1, but #2
+# pixel
+
+todo
+
+* truffle
+* web3
+* design

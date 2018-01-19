@@ -63,17 +63,18 @@ const getImageData = (pixels, width, height) => {
   return new ImageData(data, width); // eslint-disable-line no-undef
 };
 
-
+const DIM = 1000;
 const initialState = {
   hover: [null, null],
   transform: zoomIdentity,
   showGrid: true,
   gridZoomLevel: 10,
   selected: [],
+  settingsOpen: false,
 
   // constants, could/should fetch from server
-  dimensions: [500, 500],
-  imageData: getImageData(randomPixels(500 * 500), 500, 500),
+  dimensions: [DIM, DIM],
+  imageData: getImageData(randomPixels(DIM * DIM), DIM, DIM),
 };
 
 const pixelEquals = ([x1, y1], [x2, y2]) =>
@@ -124,6 +125,9 @@ export default (state = initialState, { type, payload }) => {
       return { ...state, selected: newSelected };
     }
 
+    case 'CLEAR_SELECT':
+      return { ...state, selected: [] };
+
     // TODO: not correct, needs to parse centered pixel
     // case LOCATION_CHANGE: {
     //   const path = payload.pathname;
@@ -141,6 +145,8 @@ export default (state = initialState, { type, payload }) => {
     //
     //   return state;
     // }
+
+    case 'SETTINGS_MODAL': return { ...state, settingsOpen: payload.open }
 
     default: return state;
   }

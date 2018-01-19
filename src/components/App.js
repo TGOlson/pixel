@@ -7,11 +7,19 @@ import Navbar from '../containers/Navbar';
 
 const theme = createMuiTheme();
 
+const appStyle = {
+  height: '100vh',
+  display: 'flex',
+  flexDirection: 'column',
+};
+
 const App = ({ children }) => (
   <MuiThemeProvider theme={theme}>
     <Reboot />
-    <Navbar />
-    {children}
+    <div style={appStyle}>
+      <Navbar />
+      {children}
+    </div>
   </MuiThemeProvider>
 );
 
