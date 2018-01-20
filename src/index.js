@@ -14,6 +14,20 @@ import './styles/index.less';
 
 const history = syncHistoryWithStore(browserHistory, store);
 
+// TODO: move to actions dir?
+fetch('/data/states.buffer')
+  .then(r => r.arrayBuffer())
+  .then(buffer => store.dispatch({
+    type: 'PIXEL_STATES_FETCHED',
+    payload: { buffer },
+  }));
+
+fetch('/data/prices.json')
+  .then(r => r.json())
+  .then(buffer => store.dispatch({
+    type: 'PIXEL_PRICES_FETCHED',
+    payload: { buffer },
+  }));
 
 ReactDOM.render(
   <Provider store={store}>

@@ -2,6 +2,7 @@
 
 ```
 $ npm install
+$ node ./scripts/test_data.js
 $ npm run dev
 ```
 

@@ -13,6 +13,11 @@ import PixelCanvas from '../components/PixelCanvas';
 import Settings from '../components/Settings';
 
 class Home extends Component {
+  static defaultProps = {
+    imageData: null,
+    prices: null,
+  }
+
   onPixelHover = pixel =>
     this.props.dispatch({
       type: 'PIXEL_HOVER',
@@ -61,7 +66,6 @@ class Home extends Component {
       payload: { open: false },
     });
 
-
   renderSelected = () => {
     const { selected, dimensions } = this.props;
 
@@ -80,7 +84,7 @@ class Home extends Component {
     const {
       hover: [hoverX, hoverY],
       dimensions: [x],
-      pixels,
+      prices,
       theme,
     } = this.props;
 
@@ -107,7 +111,7 @@ class Home extends Component {
           {hoverX} x {hoverY}
         </Typography>
         <Typography type="button">
-          ETH {pixels[id].price}
+          ETH {prices[id]}
         </Typography>
       </Paper>
     );
@@ -173,12 +177,17 @@ class Home extends Component {
       hover,
       selected,
       imageData,
+      prices,
       dimensions,
       transform,
       showGrid,
       gridZoomLevel,
       settingsOpen,
     } = this.props;
+
+    if (!imageData || !prices) {
+      return <p>Loading...</p>;
+    }
 
     const containerStyle = {
       display: 'flex',
@@ -224,11 +233,8 @@ Home.propTypes = {
   dispatch: PropTypes.func.isRequired,
   hover: PropTypes.arrayOf(PropTypes.number).isRequired,
   selected: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
-  imageData: PropTypes.instanceOf(ImageData).isRequired,
-  /* eslint-disable react/forbid-prop-types */
-  // prop type validation is too slow for large arrays
-  pixels: PropTypes.array.isRequired,
-  /* eslint-enable  */
+  imageData: PropTypes.instanceOf(ImageData),
+  prices: PropTypes.instanceOf(Uint16Array),
   dimensions: PropTypes.arrayOf(PropTypes.number).isRequired,
   transform: PropTypes.shape({
     x: PropTypes.number,

@@ -18,12 +18,12 @@ module.exports = {
     }],
   },
   output: {
-    path: `${parentDir}/dist}`,
+    path: path.join(parentDir, 'dist'),
     filename: 'bundle.js',
     publicPath: '/',
   },
   devServer: {
-    contentBase: parentDir,
+    contentBase: path.join(parentDir, 'public'),
     historyApiFallback: {
       disableDotRule: true,
     },
