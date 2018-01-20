@@ -3,11 +3,13 @@ import { createLogger } from 'redux-logger';
 import { routerReducer } from 'react-router-redux';
 import thunk from 'redux-thunk';
 
-import pixelcanvas from './reducers/pixelcanvas';
+import pixel from './reducers/pixel';
+import canvas from './reducers/canvas';
 
 const reducer = combineReducers({
   routing: routerReducer,
-  pixelcanvas,
+  pixel,
+  canvas,
 });
 
 const logger = createLogger({

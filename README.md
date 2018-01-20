@@ -11,6 +11,10 @@ Open `http://localhost:8080/`
 
 todo
 
+* highlight section
+* display total price
+* show current owner
+* filter by price
 * truffle
 * web3
 * update material theme

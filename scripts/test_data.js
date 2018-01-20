@@ -38,8 +38,12 @@ console.log(`Making outputdir: ${outputDir}`);
 fs.mkdir(outputDir, () => {
   console.log('Writing test data');
 
+  // TODO: two 4bit numbers can be combined into a single byte
   fs.writeFileSync(outputPath('states.buffer'), Buffer.from(states));
 
+  const uint32 = new Uint16Array(prices);
+  const uint8 = new Uint8Array(uint32.buffer);
+
   // TODO: better format than json?
-  fs.writeFileSync(outputPath('prices.json'), JSON.stringify(prices));
+  fs.writeFileSync(outputPath('prices.json'), Buffer.from(uint8));
 });

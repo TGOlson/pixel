@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -12,62 +13,57 @@ import SettingsIcon from 'material-ui-icons/Settings';
 import PixelCanvas from '../components/PixelCanvas';
 import Settings from '../components/Settings';
 
+const actions = {
+  onPixelHover: pixel => ({
+    type: 'PIXEL_HOVER',
+    payload: { pixel },
+  }),
+
+  onPixelSelect: pixel => ({
+    type: 'PIXEL_SELECT',
+    payload: { pixel },
+  }),
+
+  onClearSelections: pixel => ({
+    type: 'CLEAR_SELECT',
+    payload: { pixel },
+  }),
+
+  onCanvasZoom: transform => ({
+    type: 'CANVAS_ZOOM',
+    payload: { transform },
+  }),
+
+  onCanvasZoomEnd: () => ({
+    type: 'CANVAS_ZOOM_END',
+    payload: null,
+  }),
+
+  onShowGridChange: showGrid => ({
+    type: 'SHOW_GRID',
+    payload: { showGrid },
+  }),
+
+  openSettings: () => ({
+    type: 'SETTINGS_MODAL',
+    payload: { open: true },
+  }),
+
+  closeSettings: () => ({
+    type: 'SETTINGS_MODAL',
+    payload: { open: false },
+  }),
+};
+
 class Home extends Component {
-  static defaultProps = {
-    imageData: null,
-    prices: null,
+  constructor(props) {
+    super(props);
+
+    this.actions = bindActionCreators(actions, props.dispatch);
   }
 
-  onPixelHover = pixel =>
-    this.props.dispatch({
-      type: 'PIXEL_HOVER',
-      payload: { pixel },
-    });
-
-  onPixelSelect = pixel =>
-    this.props.dispatch({
-      type: 'PIXEL_SELECT',
-      payload: { pixel },
-    });
-
-  onClearSelections = pixel =>
-    this.props.dispatch({
-      type: 'CLEAR_SELECT',
-      payload: { pixel },
-    });
-
-  onCanvasZoom = transform =>
-    this.props.dispatch({
-      type: 'CANVAS_ZOOM',
-      payload: { transform },
-    });
-
-  onCanvasZoomEnd = () =>
-    this.props.dispatch({
-      type: 'CANVAS_ZOOM_END',
-      payload: null,
-    });
-
-  onShowGridChange = showGrid =>
-    this.props.dispatch({
-      type: 'SHOW_GRID',
-      payload: { showGrid },
-    });
-
-  openSettings = () =>
-    this.props.dispatch({
-      type: 'SETTINGS_MODAL',
-      payload: { open: true },
-    });
-
-  closeSettings = () =>
-    this.props.dispatch({
-      type: 'SETTINGS_MODAL',
-      payload: { open: false },
-    });
-
   renderSelected = () => {
-    const { selected, dimensions } = this.props;
+    const { selected, dimensions } = this.props.canvas;
 
     return selected.map(([x, y]) => {
       const id = x + (y * dimensions[0]);
@@ -82,11 +78,14 @@ class Home extends Component {
 
   renderPixelDisplay() {
     const {
+      theme,
+      pixel: { prices },
+    } = this.props;
+
+    const {
       hover: [hoverX, hoverY],
       dimensions: [x],
-      prices,
-      theme,
-    } = this.props;
+    } = this.props.canvas;
 
     if (hoverX === null) return null;
 
@@ -111,7 +110,7 @@ class Home extends Component {
           {hoverX} x {hoverY}
         </Typography>
         <Typography type="button">
-          ETH {prices[id]}
+          ETH {prices[id] / 10000 }
         </Typography>
       </Paper>
     );
@@ -127,14 +126,14 @@ class Home extends Component {
     };
 
     return (
-      <Button fab mini onClick={this.openSettings} color="contrast" style={settingsStyle}>
+      <Button fab mini onClick={this.actions.openSettings} color="contrast" style={settingsStyle}>
         <SettingsIcon />
       </Button>
     );
   }
 
   renderSelected = () => {
-    const { selected } = this.props;
+    const { selected } = this.props.canvas;
 
     const open = selected.length !== 0;
 
@@ -148,7 +147,7 @@ class Home extends Component {
 
     const action = (
       <div>
-        <Button color="accent" dense onClick={this.onClearSelections}>
+        <Button color="accent" dense onClick={this.actions.onClearSelections}>
           Clear
         </Button>
         <Button color="accent" dense>
@@ -174,16 +173,28 @@ class Home extends Component {
 
   render() {
     const {
-      hover,
-      selected,
       imageData,
       prices,
+    } = this.props.pixel;
+
+    const {
+      hover,
+      selected,
       dimensions,
       transform,
       showGrid,
       gridZoomLevel,
       settingsOpen,
-    } = this.props;
+    } = this.props.canvas;
+
+    const {
+      closeSettings,
+      onShowGridChange,
+      onPixelHover,
+      onPixelSelect,
+      onCanvasZoom,
+      onCanvasZoomEnd,
+    } = this.actions;
 
     if (!imageData || !prices) {
       return <p>Loading...</p>;
@@ -207,9 +218,9 @@ class Home extends Component {
         {settings}
         <Settings
           open={settingsOpen}
-          onClose={this.closeSettings}
+          onClose={closeSettings}
           showGrid={showGrid}
-          onShowGridChange={this.onShowGridChange}
+          onShowGridChange={onShowGridChange}
         />
         <PixelCanvas
           hover={hover}
@@ -217,10 +228,10 @@ class Home extends Component {
           imageData={imageData}
           dimensions={dimensions}
           transform={transform}
-          onPixelHover={this.onPixelHover}
-          onPixelSelect={this.onPixelSelect}
-          onZoom={this.onCanvasZoom}
-          onZoomEnd={this.onCanvasZoomEnd}
+          onPixelHover={onPixelHover}
+          onPixelSelect={onPixelSelect}
+          onZoom={onCanvasZoom}
+          onZoomEnd={onCanvasZoomEnd}
           showGrid={showGrid}
           gridZoomLevel={gridZoomLevel}
         />
@@ -231,21 +242,31 @@ class Home extends Component {
 
 Home.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  hover: PropTypes.arrayOf(PropTypes.number).isRequired,
-  selected: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
-  imageData: PropTypes.instanceOf(ImageData),
-  prices: PropTypes.instanceOf(Uint16Array),
-  dimensions: PropTypes.arrayOf(PropTypes.number).isRequired,
-  transform: PropTypes.shape({
-    x: PropTypes.number,
-    y: PropTypes.number,
-    k: PropTypes.number,
+  theme: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+
+  pixel: PropTypes.shape({
+    imageData: PropTypes.instanceOf(ImageData),
+    prices: PropTypes.instanceOf(Uint16Array),
   }).isRequired,
-  showGrid: PropTypes.bool.isRequired,
-  gridZoomLevel: PropTypes.number.isRequired,
-  settingsOpen: PropTypes.bool.isRequired,
+
+  canvas: PropTypes.shape({
+    hover: PropTypes.arrayOf(PropTypes.number).isRequired,
+    selected: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
+    dimensions: PropTypes.arrayOf(PropTypes.number).isRequired,
+    transform: PropTypes.shape({
+      x: PropTypes.number,
+      y: PropTypes.number,
+      k: PropTypes.number,
+    }).isRequired,
+    showGrid: PropTypes.bool.isRequired,
+    gridZoomLevel: PropTypes.number.isRequired,
+    settingsOpen: PropTypes.bool.isRequired,
+  }).isRequired,
 };
 
-const mapStateToProps = state => state.pixelcanvas;
+const mapStateToProps = state => ({
+  pixel: state.pixel,
+  canvas: state.canvas,
+});
 
 export default connect(mapStateToProps)(withTheme()(Home));

@@ -1,8 +1,6 @@
 import { zoomIdentity } from 'd3-zoom';
 
 import { DIMENSION } from '../util/constants';
-import { getImageData } from '../util/image';
-
 
 const initialState = {
   hover: [null, null],
@@ -14,37 +12,16 @@ const initialState = {
 
   // constants, could/should fetch from server
   dimensions: [DIMENSION, DIMENSION],
-  imageData: null,
-  prices: null,
 };
 
 const pixelEquals = ([x1, y1], [x2, y2]) =>
   x1 === x2 && y1 === y2;
 
-// const round = (n, x) => Math.round(x * (10 ** n)) / (10 ** n);
-
 const indexOfWith = (f, x, arr) =>
   arr.reduce((accum, y, index) => (f(x, y) ? index : accum), -1);
 
-
 export default (state = initialState, { type, payload }) => {
   switch (type) {
-    case 'PIXEL_STATES_FETCHED': {
-      // TODO: probably inefficient to convert to uint8 array before again changing to another uin8 array
-      // look into using some other typed array
-      const states = new Uint8ClampedArray(payload.buffer);
-      const imageData = getImageData(states, DIMENSION, DIMENSION);
-
-      return { ...state, imageData };
-    }
-
-    case 'PIXEL_PRICES_FETCHED': {
-      // TODO: consider what format these prices should be stored in
-      const prices = new Uint16Array(payload.buffer);
-
-      return { ...state, prices };
-    }
-
     case 'PIXEL_HOVER':
       return { ...state, hover: payload.pixel };
 
