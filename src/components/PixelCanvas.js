@@ -17,6 +17,25 @@ class PixelCanvas extends Component {
     this.initImageCanvas();
     this.initInteractiveCanvas();
     this.renderCanvases();
+
+    // window.addEventListener('resize', (e) => {
+    //   console.log(e);
+    //   const [dimX, dimY] = this.viewportDimensions();
+    //
+    //   this.renderCanvases();
+    //
+    //   this.imageCanvas.width = dimX;
+    //   this.imageCanvas.height = dimY;
+    //
+    //   this.interactiveCanvas.width = dimX;
+    //   this.interactiveCanvas.height = dimY;
+    //
+    //
+    //   this.imageContext.imageSmoothingEnabled = false;
+    //   this.imageContext.mozImageSmoothingEnabled = false;
+    //   this.imageContext.webkitImageSmoothingEnabled = false;
+    //   this.imageContext.msImageSmoothingEnabled = false;
+    // });
   }
 
   componentDidUpdate(prevProps) {

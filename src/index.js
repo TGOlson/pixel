@@ -4,30 +4,19 @@ import { Provider } from 'react-redux';
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 
+import { fetchPrices, fetchStates } from './actions/pixel';
 import store from './store';
-
 import App from './components/App';
 import Home from './containers/Home';
 import About from './containers/About';
-
 import './styles/index.less';
+
 
 const history = syncHistoryWithStore(browserHistory, store);
 
-// TODO: move to actions dir?
-fetch('/data/states.buffer')
-  .then(r => r.arrayBuffer())
-  .then(buffer => store.dispatch({
-    type: 'PIXEL_STATES_FETCHED',
-    payload: { buffer },
-  }));
-
-fetch('/data/prices.buffer')
-  .then(r => r.arrayBuffer())
-  .then(buffer => store.dispatch({
-    type: 'PIXEL_PRICES_FETCHED',
-    payload: { buffer },
-  }));
+// run initial actions
+store.dispatch(fetchPrices());
+store.dispatch(fetchStates());
 
 ReactDOM.render(
   <Provider store={store}>
