@@ -22,7 +22,7 @@ fetch('/data/states.buffer')
     payload: { buffer },
   }));
 
-fetch('/data/prices.json')
+fetch('/data/prices.buffer')
   .then(r => r.arrayBuffer())
   .then(buffer => store.dispatch({
     type: 'PIXEL_PRICES_FETCHED',

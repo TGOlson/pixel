@@ -45,5 +45,5 @@ fs.mkdir(outputDir, () => {
   const uint8 = new Uint8Array(uint32.buffer);
 
   // TODO: better format than json?
-  fs.writeFileSync(outputPath('prices.json'), Buffer.from(uint8));
+  fs.writeFileSync(outputPath('prices.buffer'), Buffer.from(uint8));
 });
