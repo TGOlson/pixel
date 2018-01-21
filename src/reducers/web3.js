@@ -8,9 +8,6 @@ export default (state = initialState, { type, payload }) => {
     case 'WEB3_INITIALIZED': {
       const { instance, injected } = payload;
 
-      // Put web3 on the window for debugging
-      window.web3 = instance;
-
       return { ...state, instance, injected };
     }
 

@@ -4,13 +4,13 @@ import { event, select } from 'd3-selection';
 import { zoom } from 'd3-zoom';
 
 class PixelCanvas extends Component {
-  // constructor(props) {
-  //   super(props);
-  //
-  //   this.state = {
-  //     viewportDim: [800, 799], // TODO: size to window or something
-  //   };
-  // }
+  constructor(props) {
+    super(props);
+
+    // Note: don't use state here. Parts of the render cycle use lifecycle hooks
+    // that aren't all compatible with setState.
+    this.lastUpdateReceived = null;
+  }
 
   componentDidMount() {
     this.initOffscreenCanvas();
@@ -142,7 +142,13 @@ class PixelCanvas extends Component {
       return isHoverChange ? onPixelHover(pixel) : null;
     });
 
-    canvas.on('click', () => onPixelSelect(this.getCurrentPixel()));
+    canvas.on('click', () => {
+      const pixel = this.getCurrentPixel();
+
+      if (pixel[0] === null || pixel[1] === null) return;
+
+      onPixelSelect(pixel);
+    });
 
     this.interactiveContext = canvas.node().getContext('2d');
     this.interactiveContext.imageSmoothingEnabled = false;
@@ -171,8 +177,16 @@ class PixelCanvas extends Component {
       // Note: only re-render the image canvas on transform changes
       // otherwise the changes only impact the interactive canvas
       // and re-rendering would be unnecessary overhead
-      if (!prevProps || this.isTransformChange(prevProps)) {
+      if (!prevProps || this.isTransformChange(prevProps) || this.lastUpdateReceived < this.props.lastUpdateReceived) {
+        console.log('rendering');
+
         this.renderImageCanvas();
+
+        this.lastUpdateReceived = this.props.lastUpdateReceived;
+
+        // this.setState({
+        //   lastUpdateReceived: this.props.lastUpdateReceived,
+        // });
       }
 
       // Note: always re-ender the interactive canvas
@@ -237,9 +251,11 @@ class PixelCanvas extends Component {
     context.scale(k, k);
 
     // render hovered pixels
-    context.fillStyle = 'blue';
-    context.globalAlpha = '0.4';
-    context.fillRect(hoverX + offsetX, hoverY + offsetY, 1, 1);
+    if (hoverX !== null && hoverY !== null) {
+      context.fillStyle = 'blue';
+      context.globalAlpha = '0.4';
+      context.fillRect(hoverX + offsetX, hoverY + offsetY, 1, 1);
+    }
 
     // render selected pixels
     context.fillStyle = 'blue';
@@ -331,6 +347,7 @@ PixelCanvas.propTypes = {
   }).isRequired,
   showGrid: PropTypes.bool.isRequired,
   gridZoomLevel: PropTypes.number.isRequired,
+  lastUpdateReceived: PropTypes.instanceOf(Date).isRequired,
 };
 
 export default PixelCanvas;

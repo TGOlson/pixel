@@ -9,19 +9,23 @@ export const getWeb3 = () => (dispatch) => {
       type: 'WEB3_INITIALIZED',
       payload: { instance, injected: true },
     });
-  } else {
-    // Fallback to localhost if no web3 injection. We've configured this to
-    // use the development console's port by default.
-    // Note: in the future this should be able to use a production node.
-    const provider = new Web3.providers.HttpProvider('http://127.0.0.1:9545');
 
-    const instance = new Web3(provider);
-
-    dispatch({
-      type: 'WEB3_INITIALIZED',
-      payload: { instance, injected: false },
-    });
+    return instance;
   }
+
+  // Fallback to localhost if no web3 injection. We've configured this to
+  // use the development console's port by default.
+  // Note: in the future this should be able to use a production node.
+  const provider = new Web3.providers.HttpProvider('http://127.0.0.1:9545');
+
+  const instance = new Web3(provider);
+
+  dispatch({
+    type: 'WEB3_INITIALIZED',
+    payload: { instance, injected: false },
+  });
+
+  return instance;
 };
 
 export default getWeb3;

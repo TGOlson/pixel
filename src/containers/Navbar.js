@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
@@ -11,18 +13,40 @@ const titleStyle = {
   textDecoration: 'none',
 };
 
-const Navbar = () => (
-  <div style={{ width: '100%', zIndex: 2 }}>
-    <AppBar position="static">
-      <Toolbar>
-        <Typography type="title" component={Link} to="/" color="inherit" style={titleStyle}>
-          Pixel
-        </Typography>
-        <Button component={Link} to="/about" color="contrast">About</Button>
-        <Button color="contrast">Login</Button>
-      </Toolbar>
-    </AppBar>
-  </div>
-);
+const LinkToProfile = (address) => {
+  const link = `/profile/${address}`;
 
-export default Navbar;
+  return <Button component={Link} to={link} color="contrast">Profile</Button>;
+};
+
+const Navbar = ({ address }) => {
+  const action = address
+    ? LinkToProfile(address)
+    : <Button color="contrast">Login</Button>;
+
+  return (
+    <div style={{ width: '100%', zIndex: 2 }}>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography type="title" component={Link} to="/" color="inherit" style={titleStyle}>
+            Pixel
+          </Typography>
+          <Button component={Link} to="/about" color="contrast">About</Button>
+          {action}
+        </Toolbar>
+      </AppBar>
+    </div>
+  );
+};
+
+Navbar.defaultProps = {
+  address: null,
+};
+
+Navbar.propTypes = {
+  address: PropTypes.string,
+};
+
+const mapStateToProps = state => ({ address: state.user.address });
+
+export default connect(mapStateToProps)(Navbar);

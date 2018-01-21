@@ -77,10 +77,8 @@ class Home extends Component {
   }
 
   renderPixelDisplay() {
-    const {
-      theme,
-      pixel: { prices },
-    } = this.props;
+    const { theme } = this.props;
+    const { prices, owners, addresses } = this.props.pixel;
 
     const {
       hover: [hoverX, hoverY],
@@ -96,22 +94,21 @@ class Home extends Component {
       padding: '8px 24px',
       backgroundColor: theme.palette.secondary.light,
       color: theme.palette.secondary.contrastText,
-      minWidth: '140px',
+      minWidth: '200px',
       textTransform: 'none',
     };
 
     // TODO: should be a util
     // TODO: should pixel refs like props.hover be the pixel id?
     const id = hoverX + (hoverY * x);
+    const ownerAddress = addresses[owners[id]];
+    const ownerMessage = ownerAddress ? `${ownerAddress.slice(0, 10)}...` : 'Unowned!'
 
     return (
       <Paper style={pixelDisplayStyle} elevation={4} square>
-        <Typography type="button">
-          {hoverX} x {hoverY}
-        </Typography>
-        <Typography type="button">
-          ETH {prices[id] / 10000 }
-        </Typography>
+        <Typography type="button">Pixel {hoverX} x {hoverY}</Typography>
+        <Typography type="button">Price (ETH) {prices[id] / 10000}</Typography>
+        <Typography type="button">Owner {ownerMessage}</Typography>
       </Paper>
     );
   }
@@ -175,6 +172,7 @@ class Home extends Component {
     const {
       imageData,
       prices,
+      lastUpdateReceived,
     } = this.props.pixel;
 
     const {
@@ -234,6 +232,7 @@ class Home extends Component {
           onZoomEnd={onCanvasZoomEnd}
           showGrid={showGrid}
           gridZoomLevel={gridZoomLevel}
+          lastUpdateReceived={lastUpdateReceived}
         />
       </div>
     );
@@ -247,6 +246,9 @@ Home.propTypes = {
   pixel: PropTypes.shape({
     imageData: PropTypes.instanceOf(ImageData),
     prices: PropTypes.instanceOf(Uint16Array),
+    owners: PropTypes.instanceOf(Uint8Array),
+    addresses: PropTypes.arrayOf(PropTypes.string),
+    lastUpdateReceived: PropTypes.instanceOf(Date),
   }).isRequired,
 
   canvas: PropTypes.shape({

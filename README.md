@@ -37,5 +37,7 @@ notes
 * https://github.com/ethereum/EIPs/issues/721
 * http://truffleframework.com/docs/getting_started/installation
 * https://github.com/truffle-box/react-box/blob/master/src/App.js
+* https://github.com/trufflesuite/truffle-contract
+* https://solidity.readthedocs.io/en/develop/
 
 note: this is a private repo. if this project tanks, remember to convert back to public repo
