@@ -5,6 +5,7 @@ import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 
 import { fetchPrices, fetchStates } from './actions/pixel';
+import { getWeb3 } from './actions/web3';
 import store from './store';
 import App from './components/App';
 import Home from './containers/Home';
@@ -17,6 +18,9 @@ const history = syncHistoryWithStore(browserHistory, store);
 // run initial actions
 store.dispatch(fetchPrices());
 store.dispatch(fetchStates());
+
+// Wait for window to load to avoid race conditions with web3 injection timing.
+window.addEventListener('load', () => store.dispatch(getWeb3()));
 
 ReactDOM.render(
   <Provider store={store}>

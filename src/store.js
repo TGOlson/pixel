@@ -5,11 +5,13 @@ import thunk from 'redux-thunk';
 
 import pixel from './reducers/pixel';
 import canvas from './reducers/canvas';
+import web3 from './reducers/web3';
 
 const reducer = combineReducers({
   routing: routerReducer,
   pixel,
   canvas,
+  web3,
 });
 
 const logger = createLogger({

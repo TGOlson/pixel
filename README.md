@@ -26,8 +26,6 @@ todo
 * display total price
 * show current owner
 * filter by price
-* truffle
-* web3
 * update material theme
 * server?
 
