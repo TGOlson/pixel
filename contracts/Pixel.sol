@@ -14,6 +14,14 @@ contract Pixel {
       uint indexed _tokenId
   );
 
+  function setStates(uint[] _tokenIds, uint8[] _states) public {
+    require(_tokenIds.length == _states.length);
+
+    for (uint i = 0; i < _tokenIds.length; i++) {
+      setPixelState(_tokenIds[i], _states[i]);
+    }
+  }
+
   function setPixelState(uint _tokenId, uint8 _state) public {
     require(_tokenId < maxSupply);
     require(_state < numStates);
