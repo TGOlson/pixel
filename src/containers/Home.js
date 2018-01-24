@@ -102,12 +102,16 @@ class Home extends Component {
     // TODO: should pixel refs like props.hover be the pixel id?
     const id = hoverX + (hoverY * x);
     const ownerAddress = addresses[owners[id]];
-    const ownerMessage = ownerAddress ? `${ownerAddress.slice(0, 10)}...` : 'Unowned!'
+    const ownerMessage = ownerAddress ? `${ownerAddress.slice(0, 10)}...` : 'Unowned!';
+
+    const initialPrice = '100000000000000'; // TODO: fetch from contract on load
+    const price = prices[id] === undefined ? initialPrice : prices[id].toString();
+    const priceFormatted = this.props.web3.fromWei(price, 'ether');
 
     return (
       <Paper style={pixelDisplayStyle} elevation={4} square>
         <Typography type="button">Pixel {hoverX} x {hoverY}</Typography>
-        <Typography type="button">Price (ETH) {prices[id] / 10000}</Typography>
+        <Typography type="button">Price (ETH) {priceFormatted}</Typography>
         <Typography type="button">Owner {ownerMessage}</Typography>
       </Paper>
     );
@@ -245,7 +249,7 @@ Home.propTypes = {
 
   pixel: PropTypes.shape({
     imageData: PropTypes.instanceOf(ImageData),
-    prices: PropTypes.instanceOf(Uint16Array),
+    prices: PropTypes.instanceOf(Array),
     owners: PropTypes.instanceOf(Uint8ClampedArray),
     addresses: PropTypes.arrayOf(PropTypes.string),
     lastUpdateReceived: PropTypes.instanceOf(Date),
@@ -267,6 +271,7 @@ Home.propTypes = {
 };
 
 const mapStateToProps = state => ({
+  web3: state.web3.instance,
   pixel: state.pixel,
   canvas: state.canvas,
 });

@@ -48,9 +48,12 @@ export const fetchPrices = () =>
   (dispatch, getState) => {
     const state = getState();
     const pixelContract = state.contract.pixel;
-    const buffer = new ArrayBuffer(1000 * 1000 * 2);
-    const prices = new Uint16Array(buffer);
-    prices.fill(1);
+
+    // TODO: can't realistically store 1M big numbers
+    const prices = new Array(1000 * 1000);
+    // const buffer = new ArrayBuffer(1000 * 1000 * 2);
+    // const prices = new Uint16Array(buffer);
+    // prices.fill(1);
 
     // TODO: is fromBlock a bad idea? will results be too slow on the main net?
     // also, should at least update to when contract was deployed

@@ -5,8 +5,8 @@
 ```
 $ npm install
 $ npm install -g truffle
-$ node ./scripts/test_data.js
-$ truffle migrate
+$ truffle develop
+truffle(develop)> migrate
 ```
 
 #### dev
