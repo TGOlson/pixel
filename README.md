@@ -24,10 +24,11 @@ todo
 * resize canvas on window resize
 * highlight section
 * display total price
-* show current owner
 * filter by price
 * update material theme
 * server?
+
+Note: max gas per block is current ~8m. Buying 10 pixels at once will take roughly 400k gas. This app should probably limit purchases to 10 at a time, or split purchases into groups of 10.
 
 notes
 
