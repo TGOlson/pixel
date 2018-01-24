@@ -16,13 +16,14 @@ const initialState = {
   prices: null,
   lastUpdateReceived: null,
   owners: null,
+  stateEventsById: {},
 };
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
     case 'PIXEL_STATES_FETCHED': {
-      const states = new Uint8ClampedArray(payload.buffer);
-      const hexValues = new Uint32Array(payload.buffer.byteLength);
+      const { states } = payload;
+      const hexValues = new Uint32Array(states.byteLength);
 
       states.forEach((x, i) => {
         hexValues[i] = getPixelHex(x);
@@ -50,22 +51,27 @@ export default (state = initialState, { type, payload }) => {
       return { ...state, lastUpdateReceived: new Date() };
     }
 
-    case 'PIXEL_PRICES_FETCHED': {
-      // TODO: consider what format these prices should be stored in
-      const prices = new Uint16Array(payload.buffer);
+    // TODO: consider what format these prices should be stored in
+    case 'PIXEL_PRICES_FETCHED':
+      return { ...state, prices: payload.prices };
 
-      return { ...state, prices };
-    }
-
-    case 'PIXEL_OWNERS_FETCHED': {
-      // TODO: consider what format these prices should be stored in
-      const owners = new Uint8Array(payload.buffer);
-
-      return { ...state, owners };
-    }
+    case 'PIXEL_OWNERS_FETCHED':
+      return { ...state, owners: payload.owners };
 
     case 'OWNER_ADDRESSES_FETCHED':
       return { ...state, addresses: payload.addresses };
+
+    case 'STATE_EVENTS_FETCHED': {
+      const { id, events } = payload;
+      const { stateEventsById } = state;
+
+      const newStateEventsById = {
+        ...stateEventsById,
+        [id]: events,
+      };
+
+      return { ...state, stateEventsById: newStateEventsById };
+    }
 
     default: return state;
   }

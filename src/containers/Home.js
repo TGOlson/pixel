@@ -246,7 +246,7 @@ Home.propTypes = {
   pixel: PropTypes.shape({
     imageData: PropTypes.instanceOf(ImageData),
     prices: PropTypes.instanceOf(Uint16Array),
-    owners: PropTypes.instanceOf(Uint8Array),
+    owners: PropTypes.instanceOf(Uint8ClampedArray),
     addresses: PropTypes.arrayOf(PropTypes.string),
     lastUpdateReceived: PropTypes.instanceOf(Date),
   }).isRequired,
