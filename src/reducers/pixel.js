@@ -17,6 +17,8 @@ const initialState = {
   lastUpdateReceived: null,
   owners: null,
   stateEventsById: {},
+  priceEventsById: {},
+  transferEventsById: {},
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -56,21 +58,33 @@ export default (state = initialState, { type, payload }) => {
       return { ...state, prices: payload.prices };
 
     case 'PIXEL_OWNERS_FETCHED':
-      return { ...state, owners: payload.owners };
-
-    case 'OWNER_ADDRESSES_FETCHED':
-      return { ...state, addresses: payload.addresses };
+      return { ...state, owners: payload.owners, addresses: payload.addresses };
 
     case 'STATE_EVENTS_FETCHED': {
       const { id, events } = payload;
       const { stateEventsById } = state;
 
-      const newStateEventsById = {
-        ...stateEventsById,
-        [id]: events,
-      };
+      const newStateEventsById = { ...stateEventsById, [id]: events };
 
       return { ...state, stateEventsById: newStateEventsById };
+    }
+
+    case 'PRICE_EVENTS_FETCHED': {
+      const { id, events } = payload;
+      const { priceEventsById } = state;
+
+      const newPriceEventsById = { ...priceEventsById, [id]: events };
+
+      return { ...state, priceEventsById: newPriceEventsById };
+    }
+
+    case 'TRANSFER_EVENTS_FETCHED': {
+      const { id, events } = payload;
+      const { transferEventsById } = state;
+
+      const newTransferEventsById = { ...transferEventsById, [id]: events };
+
+      return { ...state, transferEventsById: newTransferEventsById };
     }
 
     default: return state;

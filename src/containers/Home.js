@@ -176,6 +176,7 @@ class Home extends Component {
     const {
       imageData,
       prices,
+      owners,
       lastUpdateReceived,
     } = this.props.pixel;
 
@@ -198,7 +199,7 @@ class Home extends Component {
       onCanvasZoomEnd,
     } = this.actions;
 
-    if (!imageData || !prices) {
+    if (!imageData || !prices || !owners) {
       return <p>Loading...</p>;
     }
 

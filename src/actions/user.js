@@ -1,14 +1,12 @@
-export const getAccounts = () =>
-  (dispatch, getState) => {
-    const state = getState();
-    const web3 = state.web3.instance;
-
-    web3.eth.getAccounts((err, accounts) => {
-      dispatch({
+export const getAccounts = web3 => new Promise((resolve, reject) => {
+  web3.eth.getAccounts((error, accounts) => (
+    error
+      ? reject(error)
+      : resolve({
         type: 'USER_ADDRESS_FETCHED',
         payload: { address: accounts[0] },
-      });
-    });
-  };
+      })
+  ));
+});
 
 export default getAccounts;

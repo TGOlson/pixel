@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import Typography from 'material-ui/Typography';
 
-import { getSetStateEvents } from '../actions/pixel';
+import { getSetStateEvents, getPriceChangeEvents, getTransferEvents } from '../actions/pixel';
 
 class Pixel extends Component {
   constructor(props) {
@@ -22,15 +22,51 @@ class Pixel extends Component {
   }
 
   componentDidMount() {
-    console.log(this.state.coords, this.state.id);
-    this.props.dispatch(getSetStateEvents(this.state.id));
+    // console.log(this.state.coords, this.state.id);
+
+    const { dispatch, loadPromise } = this.props;
+    const { id } = this.state;
+
+    loadPromise.initialLoad.then(() => {
+      dispatch(getSetStateEvents(id));
+      dispatch(getPriceChangeEvents(id));
+      dispatch(getTransferEvents(id));
+    });
   }
 
-  renderEvents = (events) => {
+  isLoaded() {
+    const { id } = this.state;
+
+    const {
+      stateEventsById,
+      priceEventsById,
+      transferEventsById,
+    } = this.props.pixel;
+
+    return stateEventsById[id] && priceEventsById[id] && transferEventsById[id];
+  }
+
+  renderEvents() {
+    const { id } = this.state;
+
+    const {
+      stateEventsById,
+      priceEventsById,
+      transferEventsById,
+    } = this.props.pixel;
+
+    const events = [
+      ...stateEventsById[id],
+      ...priceEventsById[id],
+      ...transferEventsById[id],
+    ];
+
     // TODO: handle other event types
-    const items = events.map((ev, i) => (
-      <li key={i}>Block {ev.blockNumber}. Set pixel state to {ev.args.state}.</li>
-    ));
+    const items = events.map((ev) => {
+      const key = `${ev.blockNumber}_${ev.transactionIndex}_${ev.type}`;
+
+      return <li key={key}>Type {ev.type} Block {ev.blockNumber}. State {ev.args.state}.</li>;
+    });
 
     return (
       <ul>
@@ -44,13 +80,11 @@ class Pixel extends Component {
 
     if (id === null) return <p>Not found!</p>;
 
-    const { stateEventsById } = this.props.pixel;
-
-    if (!stateEventsById[id]) return <p>Loading!</p>;
+    if (!this.isLoaded()) return <p>Loading!</p>;
 
     const [x, y] = coords;
 
-    const events = this.renderEvents(stateEventsById[id]);
+    const events = this.renderEvents();
 
     return (
       <div style={{ width: '100%', zIndex: 2 }}>
@@ -67,6 +101,18 @@ class Pixel extends Component {
 }
 
 Pixel.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+
+  pixel: PropTypes.shape({
+    stateEventsById: PropTypes.object.isRequired,
+    priceEventsById: PropTypes.object.isRequired,
+    transferEventsById: PropTypes.object.isRequired,
+  }).isRequired,
+
+  loadPromise: PropTypes.shape({
+    initialLoad: PropTypes.instanceOf(Promise).isRequired,
+  }).isRequired,
+
   routeParams: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
