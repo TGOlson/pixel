@@ -20,23 +20,26 @@ import './styles/index.less';
 
 const history = syncHistoryWithStore(browserHistory, store);
 
-const initialLoadPromise = store.dispatch(getWeb3()).then(() => {
-  const web3 = store.getState().web3.instance;
-  window.web3 = web3;
-
-  store.dispatch(PixelActions.loadContract(web3));
-  return store.dispatch(getAccounts(web3));
-}).then(() => {
+const setWindowDebugObjects = () => {
   const state = store.getState();
 
   // add useful bits to the window for debugging
+  window.store = store;
+  window.web3 = state.web3.instance;
   window.pixelContract = state.contract.pixel;
   window.defaultAccount = state.user.address;
 
   // TODO: think this can be dropped
   // only useful for console testing
-  window.web3.eth.defaultAccount = window.web3.eth.accounts[0];
-});
+  // window.web3.eth.defaultAccount = window.web3.eth.accounts[0];
+};
+
+const initialLoadPromise = store.dispatch(getWeb3()).then(() => {
+  const web3 = store.getState().web3.instance;
+
+  store.dispatch(PixelActions.loadContract(web3));
+  return store.dispatch(getAccounts(web3));
+}).then(() => setWindowDebugObjects());
 
 const contractStatePromise = initialLoadPromise.then(() => {
   const contract = store.getState().contract.pixel;
@@ -45,6 +48,7 @@ const contractStatePromise = initialLoadPromise.then(() => {
     store.dispatch(PixelActions.fetchPrices(contract)),
     store.dispatch(PixelActions.fetchStates(contract)),
     store.dispatch(PixelActions.fetchOwners(contract)),
+    store.dispatch(PixelActions.fetchInitialPrice(contract)),
   ]);
 });
 

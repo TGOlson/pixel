@@ -3,7 +3,13 @@ import PropTypes from 'prop-types';
 import { event, select } from 'd3-selection';
 import { zoom } from 'd3-zoom';
 
+import { coordsToId, idToCoords } from '../util/pixel';
+
 class PixelCanvas extends Component {
+  static defaultProps = {
+    hover: null,
+  }
+
   constructor(props) {
     super(props);
 
@@ -58,10 +64,10 @@ class PixelCanvas extends Component {
     const pixelY = Math.floor((event.offsetY - y) / k) - offsetY;
 
     if (pixelX < 0 || pixelX >= imageX || pixelY < 0 || pixelY >= imageY) {
-      return [null, null];
+      return null;
     }
 
-    return [pixelX, pixelY];
+    return coordsToId(pixelX, pixelY);
   }
 
   isTransformChange = ({ transform }) => {
@@ -132,22 +138,21 @@ class PixelCanvas extends Component {
       .on('end', onZoomEnd));
 
     canvas.on('mousemove', () => {
-      const pixel = this.getCurrentPixel();
+      const pixel = this.getCurrentPixel(true);
       const { hover } = this.props;
 
-      const isHoverChange =
-        pixel[0] !== hover[0] ||
-        pixel[1] !== hover[1];
 
-      return isHoverChange ? onPixelHover(pixel) : null;
+      if (pixel !== hover) {
+        onPixelHover(pixel);
+      }
     });
 
     canvas.on('click', () => {
       const pixel = this.getCurrentPixel();
 
-      if (pixel[0] === null || pixel[1] === null) return;
-
-      onPixelSelect(pixel);
+      if (pixel !== null) {
+        onPixelSelect(pixel);
+      }
     });
 
     this.interactiveContext = canvas.node().getContext('2d');
@@ -226,7 +231,7 @@ class PixelCanvas extends Component {
 
   renderInteractiveCanvas = () => {
     const {
-      hover: [hoverX, hoverY],
+      hover,
       selected,
       transform: { x, y, k },
       dimensions: [imageX, imageY],
@@ -250,7 +255,8 @@ class PixelCanvas extends Component {
     context.scale(k, k);
 
     // render hovered pixels
-    if (hoverX !== null && hoverY !== null) {
+    if (hover !== null) {
+      const [hoverX, hoverY] = idToCoords(hover);
       context.fillStyle = 'white';
       context.globalAlpha = '0.3';
       context.fillRect(hoverX + offsetX, hoverY + offsetY, 1, 1);
@@ -260,7 +266,8 @@ class PixelCanvas extends Component {
     context.fillStyle = 'blue';
     context.globalAlpha = '1.0';
 
-    selected.forEach(([selectedX, selectedY]) => {
+    selected.forEach((id) => {
+      const [selectedX, selectedY] = idToCoords(id);
       context.fillRect(selectedX + offsetX, selectedY + offsetY, 1, 1);
     });
 
@@ -331,8 +338,8 @@ class PixelCanvas extends Component {
 
 
 PixelCanvas.propTypes = {
-  hover: PropTypes.arrayOf(PropTypes.number).isRequired,
-  selected: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
+  hover: PropTypes.number,
+  selected: PropTypes.arrayOf(PropTypes.number).isRequired,
   onPixelHover: PropTypes.func.isRequired,
   onPixelSelect: PropTypes.func.isRequired,
   onZoom: PropTypes.func.isRequired,

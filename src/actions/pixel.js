@@ -13,6 +13,15 @@ export const loadContract = (web3) => {
   };
 };
 
+export const fetchInitialPrice = pixelContract => new Promise((resolve, reject) =>
+  pixelContract.initialPrice((err, res) => {
+    if (err) return reject(err);
+    return resolve({
+      type: 'PIXEL_INITIAL_PRICE_FETCHED',
+      payload: { initialPrice: res },
+    });
+  }));
+
 // export const fetchStates = () =>
 //   dispatch =>
 //     fetch('/data/states.buffer')
@@ -205,5 +214,31 @@ export const getTransferEvents = id => (dispatch, getState) => {
       type: 'TRANSFER_EVENTS_FETCHED',
       payload: { id, events: formattedEvents },
     });
+  });
+};
+
+export const purchasePixels = ids => (dispatch, getState) => {
+  const state = getState();
+  const from = state.user.address;
+  const pixelContract = state.contract.pixel;
+  const { prices, initialPrice } = state.pixel;
+
+  // TODO: gas price should be dynamically estimated
+  const gas = 2000000;
+
+  const value = ids.map(x => prices[x] || initialPrice).reduce((x, y) => x.add(y));
+
+  pixelContract.purchaseMany(ids, { from, value, gas }, (error, transaction) => {
+    if (error) {
+      dispatch({
+        type: 'PIXEL_PURCHASE_ERROR',
+        payload: { error },
+      });
+    } else {
+      dispatch({
+        type: 'PIXEL_PURCHASE_SUCCESS',
+        payload: { transaction },
+      });
+    }
   });
 };

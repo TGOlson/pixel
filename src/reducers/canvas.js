@@ -3,7 +3,7 @@ import { zoomIdentity } from 'd3-zoom';
 import { DIMENSION } from '../util/constants';
 
 const initialState = {
-  hover: [null, null],
+  hover: null,
   transform: zoomIdentity,
   showGrid: true,
   gridZoomLevel: 10,
@@ -14,11 +14,6 @@ const initialState = {
   dimensions: [DIMENSION, DIMENSION],
 };
 
-const pixelEquals = ([x1, y1], [x2, y2]) =>
-  x1 === x2 && y1 === y2;
-
-const indexOfWith = (f, x, arr) =>
-  arr.reduce((accum, y, index) => (f(x, y) ? index : accum), -1);
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
@@ -52,7 +47,7 @@ export default (state = initialState, { type, payload }) => {
     case 'PIXEL_SELECT': {
       const { selected } = state;
 
-      const index = indexOfWith(pixelEquals, payload.pixel, selected);
+      const index = selected.indexOf(payload.pixel);
 
       const newSelected = index >= 0
         ? [...selected.slice(0, index), ...selected.slice(index + 1)]
@@ -62,6 +57,9 @@ export default (state = initialState, { type, payload }) => {
     }
 
     case 'CLEAR_SELECT':
+      return { ...state, selected: [] };
+
+    case 'PIXEL_PURCHASE_SUCCESS':
       return { ...state, selected: [] };
 
     // TODO: not correct, needs to parse centered pixel

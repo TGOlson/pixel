@@ -19,6 +19,9 @@ const initialState = {
   stateEventsById: {},
   priceEventsById: {},
   transferEventsById: {},
+  initialPrice: null,
+  purchaseError: null,
+  purchaseTransaction: null,
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -60,6 +63,9 @@ export default (state = initialState, { type, payload }) => {
     case 'PIXEL_OWNERS_FETCHED':
       return { ...state, owners: payload.owners, addresses: payload.addresses };
 
+    case 'PIXEL_INITIAL_PRICE_FETCHED':
+      return { ...state, initialPrice: payload.initialPrice };
+
     case 'STATE_EVENTS_FETCHED': {
       const { id, events } = payload;
       const { stateEventsById } = state;
@@ -86,6 +92,12 @@ export default (state = initialState, { type, payload }) => {
 
       return { ...state, transferEventsById: newTransferEventsById };
     }
+
+    case 'PIXEL_PURCHASE_SUCCESS':
+      return { ...state, purchaseTransaction: payload.transaction };
+
+    case 'PIXEL_PURCHASE_ERROR':
+      return { ...state, purchaseError: payload.error };
 
     default: return state;
   }

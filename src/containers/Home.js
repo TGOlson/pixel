@@ -10,7 +10,12 @@ import Typography from 'material-ui/Typography';
 import Snackbar from 'material-ui/Snackbar';
 import SettingsIcon from 'material-ui-icons/Settings';
 
+import { idToCoords } from '../util/pixel';
+
+import { purchasePixels } from '../actions/pixel';
+
 import PixelCanvas from '../components/PixelCanvas';
+import PurchaseSuccess from '../components/PurchaseSuccess';
 import Settings from '../components/Settings';
 
 const actions = {
@@ -53,39 +58,33 @@ const actions = {
     type: 'SETTINGS_MODAL',
     payload: { open: false },
   }),
+
+  purchase: purchasePixels,
 };
 
 class Home extends Component {
+  static defaultProps = {
+    web3: null,
+  }
+
   constructor(props) {
     super(props);
 
     this.actions = bindActionCreators(actions, props.dispatch);
   }
 
-  renderSelected = () => {
-    const { selected, dimensions } = this.props.canvas;
-
-    return selected.map(([x, y]) => {
-      const id = x + (y * dimensions[0]);
-
-      return (
-        <a key={id} style={{ marginRight: '5px' }} href="/#">
-          {x}x{y}
-        </a>
-      );
-    });
-  }
-
   renderPixelDisplay() {
     const { theme } = this.props;
-    const { prices, owners, addresses } = this.props.pixel;
-
     const {
-      hover: [hoverX, hoverY],
-      dimensions: [x],
-    } = this.props.canvas;
+      prices,
+      owners,
+      addresses,
+      initialPrice,
+    } = this.props.pixel;
 
-    if (hoverX === null) return null;
+    const { hover } = this.props.canvas;
+
+    if (hover === null) return null;
 
     const pixelDisplayStyle = {
       position: 'absolute',
@@ -98,15 +97,12 @@ class Home extends Component {
       textTransform: 'none',
     };
 
-    // TODO: should be a util
-    // TODO: should pixel refs like props.hover be the pixel id?
-    const id = hoverX + (hoverY * x);
-    const ownerAddress = addresses[owners[id]];
+    const [hoverX, hoverY] = idToCoords(hover);
+    const ownerAddress = addresses[owners[hover]];
     const ownerMessage = ownerAddress ? `${ownerAddress.slice(0, 10)}...` : 'Unowned!';
 
-    const initialPrice = '100000000000000'; // TODO: fetch from contract on load
-    const price = prices[id] === undefined ? initialPrice : prices[id].toString();
-    const priceFormatted = this.props.web3.fromWei(price, 'ether');
+    const price = prices[hover] === undefined ? initialPrice : prices[hover];
+    const priceFormatted = this.props.web3.fromWei(price, 'ether').toString();
 
     return (
       <Paper style={pixelDisplayStyle} elevation={4} square>
@@ -146,12 +142,14 @@ class Home extends Component {
       zIndex: 1,
     };
 
+    const purchase = () => this.actions.purchase(selected);
+
     const action = (
       <div>
         <Button color="accent" dense onClick={this.actions.onClearSelections}>
           Clear
         </Button>
-        <Button color="accent" dense>
+        <Button color="accent" dense onClick={purchase}>
           Purchase
         </Button>
       </div>
@@ -178,6 +176,7 @@ class Home extends Component {
       prices,
       owners,
       lastUpdateReceived,
+      purchaseTransaction,
     } = this.props.pixel;
 
     const {
@@ -225,6 +224,10 @@ class Home extends Component {
           showGrid={showGrid}
           onShowGridChange={onShowGridChange}
         />
+        <PurchaseSuccess
+          transactionId={purchaseTransaction}
+          onClose={() => console.log('wanna close this')}
+        />
         <PixelCanvas
           hover={hover}
           selected={selected}
@@ -247,7 +250,7 @@ class Home extends Component {
 Home.propTypes = {
   dispatch: PropTypes.func.isRequired,
   theme: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
-  web3: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  web3: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 
   pixel: PropTypes.shape({
     imageData: PropTypes.instanceOf(ImageData),
@@ -255,11 +258,14 @@ Home.propTypes = {
     owners: PropTypes.instanceOf(Uint8ClampedArray),
     addresses: PropTypes.arrayOf(PropTypes.string),
     lastUpdateReceived: PropTypes.instanceOf(Date),
+    initialPrice: PropTypes.object,
+    purchaseError: PropTypes.string,
+    purchaseTransaction: PropTypes.string,
   }).isRequired,
 
   canvas: PropTypes.shape({
-    hover: PropTypes.arrayOf(PropTypes.number).isRequired,
-    selected: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
+    hover: PropTypes.number,
+    selected: PropTypes.arrayOf(PropTypes.number).isRequired,
     dimensions: PropTypes.arrayOf(PropTypes.number).isRequired,
     transform: PropTypes.shape({
       x: PropTypes.number,

@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 
 import Typography from 'material-ui/Typography';
 
+import { coordsToId } from '../util/pixel';
+
 import { getSetStateEvents, getPriceChangeEvents, getTransferEvents } from '../actions/pixel';
 
 class Pixel extends Component {
@@ -16,7 +18,7 @@ class Pixel extends Component {
       ? [parseInt(match[1], 10), parseInt(match[2], 10)]
       : null;
 
-    const id = coords ? coords[0] + (coords[1] * 1000) : null;
+    const id = coords ? coordsToId(...coords) : null;
 
     this.state = { coords, id };
   }
