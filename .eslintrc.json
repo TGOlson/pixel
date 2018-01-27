@@ -10,6 +10,7 @@
     },
     "rules": {
       "max-len": ["error", { "code": 110 }],
+      "no-underscore-dangle": ["off"],
       "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
       "no-confusing-arrow": ["error", {"allowParens": true}]
     },

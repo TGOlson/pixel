@@ -186,10 +186,6 @@ class PixelCanvas extends Component {
         this.renderImageCanvas();
 
         this.lastUpdateReceived = this.props.lastUpdateReceived;
-
-        // this.setState({
-        //   lastUpdateReceived: this.props.lastUpdateReceived,
-        // });
       }
 
       // Note: always re-ender the interactive canvas

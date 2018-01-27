@@ -247,6 +247,7 @@ class Home extends Component {
 Home.propTypes = {
   dispatch: PropTypes.func.isRequired,
   theme: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  web3: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
 
   pixel: PropTypes.shape({
     imageData: PropTypes.instanceOf(ImageData),
