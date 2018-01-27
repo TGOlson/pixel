@@ -223,22 +223,23 @@ export const purchasePixels = ids => (dispatch, getState) => {
   const pixelContract = state.contract.pixel;
   const { prices, initialPrice } = state.pixel;
 
-  // TODO: gas price should be dynamically estimated
-  const gas = 2000000;
-
   const value = ids.map(x => prices[x] || initialPrice).reduce((x, y) => x.add(y));
 
-  pixelContract.purchaseMany(ids, { from, value, gas }, (error, transaction) => {
-    if (error) {
-      dispatch({
-        type: 'PIXEL_PURCHASE_ERROR',
-        payload: { error },
-      });
-    } else {
-      dispatch({
-        type: 'PIXEL_PURCHASE_SUCCESS',
-        payload: { transaction },
-      });
-    }
+  pixelContract.purchaseMany.estimateGas(ids, { from, value }, (estimateError, gasEstimate) => {
+    if (estimateError) throw estimateError;
+
+    pixelContract.purchaseMany(ids, { from, value, gas: gasEstimate + 2 }, (error, transaction) => {
+      if (error) {
+        dispatch({
+          type: 'PIXEL_PURCHASE_ERROR',
+          payload: { error },
+        });
+      } else {
+        dispatch({
+          type: 'PIXEL_PURCHASE_SUCCESS',
+          payload: { transaction },
+        });
+      }
+    });
   });
 };
