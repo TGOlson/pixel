@@ -232,7 +232,7 @@ export const purchasePixels = ids => (dispatch, getState) => {
       if (error) {
         dispatch({
           type: 'PIXEL_PURCHASE_ERROR',
-          payload: { error },
+          payload: { error: error.message },
         });
       } else {
         dispatch({

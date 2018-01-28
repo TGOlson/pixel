@@ -15,7 +15,8 @@ import { idToCoords } from '../util/pixel';
 import { purchasePixels } from '../actions/pixel';
 
 import PixelCanvas from '../components/PixelCanvas';
-import PurchaseSuccess from '../components/PurchaseSuccess';
+import TransactionError from '../components/TransactionError';
+import TransactionSuccess from '../components/TransactionSuccess';
 import Settings from '../components/Settings';
 
 const actions = {
@@ -50,13 +51,11 @@ const actions = {
   }),
 
   openSettings: () => ({
-    type: 'SETTINGS_MODAL',
-    payload: { open: true },
+    type: 'SETTINGS_MODAL_OPEN',
   }),
 
-  closeSettings: () => ({
-    type: 'SETTINGS_MODAL',
-    payload: { open: false },
+  onModalClose: () => ({
+    type: 'MODAL_DISMISS',
   }),
 
   purchase: purchasePixels,
@@ -177,6 +176,7 @@ class Home extends Component {
       owners,
       lastUpdateReceived,
       purchaseTransaction,
+      purchaseError,
     } = this.props.pixel;
 
     const {
@@ -186,16 +186,21 @@ class Home extends Component {
       transform,
       showGrid,
       gridZoomLevel,
-      settingsOpen,
     } = this.props.canvas;
 
     const {
-      closeSettings,
+      purchaseSuccessModalOpen,
+      purchaseErrorModalOpen,
+      settingsModalOpen,
+    } = this.props.modal;
+
+    const {
       onShowGridChange,
       onPixelHover,
       onPixelSelect,
       onCanvasZoom,
       onCanvasZoomEnd,
+      onModalClose,
     } = this.actions;
 
     if (!imageData || !prices || !owners) {
@@ -219,14 +224,20 @@ class Home extends Component {
         {pixelDisplay}
         {settings}
         <Settings
-          open={settingsOpen}
-          onClose={closeSettings}
+          open={settingsModalOpen}
+          onClose={onModalClose}
           showGrid={showGrid}
           onShowGridChange={onShowGridChange}
         />
-        <PurchaseSuccess
+        <TransactionSuccess
+          open={purchaseSuccessModalOpen}
           transactionId={purchaseTransaction}
-          onClose={() => console.log('wanna close this')}
+          onClose={onModalClose}
+        />
+        <TransactionError
+          open={purchaseErrorModalOpen}
+          message={purchaseError}
+          onClose={onModalClose}
         />
         <PixelCanvas
           hover={hover}
@@ -252,6 +263,12 @@ Home.propTypes = {
   theme: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
   web3: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 
+  modal: PropTypes.shape({
+    purchaseSuccessModalOpen: PropTypes.bool.isRequired,
+    purchaseErrorModalOpen: PropTypes.bool.isRequired,
+    settingsModalOpen: PropTypes.bool.isRequired,
+  }).isRequired,
+
   pixel: PropTypes.shape({
     imageData: PropTypes.instanceOf(ImageData),
     prices: PropTypes.instanceOf(Array),
@@ -274,14 +291,14 @@ Home.propTypes = {
     }).isRequired,
     showGrid: PropTypes.bool.isRequired,
     gridZoomLevel: PropTypes.number.isRequired,
-    settingsOpen: PropTypes.bool.isRequired,
   }).isRequired,
 };
 
 const mapStateToProps = state => ({
-  web3: state.web3.instance,
-  pixel: state.pixel,
   canvas: state.canvas,
+  modal: state.modal,
+  pixel: state.pixel,
+  web3: state.web3.instance,
 });
 
 export default connect(mapStateToProps)(withTheme()(Home));

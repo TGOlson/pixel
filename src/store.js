@@ -7,6 +7,8 @@ import promise from 'redux-promise';
 import canvas from './reducers/canvas';
 import contract from './reducers/contract';
 import loadPromise from './reducers/loadPromise';
+import modal from './reducers/modal';
+import network from './reducers/network';
 import pixel from './reducers/pixel';
 import user from './reducers/user';
 import web3 from './reducers/web3';
@@ -16,6 +18,8 @@ const reducer = combineReducers({
   canvas,
   contract,
   loadPromise,
+  modal,
+  network,
   pixel,
   user,
   web3,

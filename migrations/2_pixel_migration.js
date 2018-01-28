@@ -17,7 +17,7 @@ const seedData = (instance, accounts) => {
 module.exports = (deployer, network, accounts) => {
   const res = deployer.deploy(Pixel);
 
-  if (network == "develop") {
+  if (network == "development") {
     deployer.deploy(Pixel)
       .then(() => Pixel.deployed())
       .then(instance => seedData(instance, accounts));

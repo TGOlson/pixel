@@ -7,6 +7,7 @@ import { syncHistoryWithStore } from 'react-router-redux';
 import store from './store';
 
 import * as PixelActions from './actions/pixel';
+import { getNetworkId } from './actions/network';
 import { getAccounts } from './actions/user';
 import { getWeb3 } from './actions/web3';
 
@@ -38,7 +39,11 @@ const initialLoadPromise = store.dispatch(getWeb3()).then(() => {
   const web3 = store.getState().web3.instance;
 
   store.dispatch(PixelActions.loadContract(web3));
-  return store.dispatch(getAccounts(web3));
+
+  return Promise.all([
+    store.dispatch(getNetworkId(web3)),
+    store.dispatch(getAccounts(web3)),
+  ]);
 }).then(() => setWindowDebugObjects());
 
 const contractStatePromise = initialLoadPromise.then(() => {

@@ -80,9 +80,6 @@ export default (state = initialState, { type, payload }) => {
     //   return state;
     // }
 
-    case 'SETTINGS_MODAL':
-      return { ...state, settingsOpen: payload.open };
-
     default: return state;
   }
 };
