@@ -69,7 +69,7 @@ class TransactionError extends Component {
           {debugInfo}
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} color="primary">Ok</Button>
+          <Button onClick={onClose} color="inherit">Ok</Button>
         </DialogActions>
       </Dialog>
     );

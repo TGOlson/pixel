@@ -9,6 +9,8 @@ import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
 import Snackbar from 'material-ui/Snackbar';
 import SettingsIcon from 'material-ui-icons/Settings';
+import Input, { InputLabel } from 'material-ui/Input';
+import { FormControl } from 'material-ui/Form';
 
 import { idToCoords } from '../util/pixel';
 
@@ -89,25 +91,38 @@ class Home extends Component {
       position: 'absolute',
       zIndex: 1,
       margin: '8px',
-      padding: '8px 24px',
-      backgroundColor: theme.palette.secondary.light,
-      color: theme.palette.secondary.contrastText,
-      minWidth: '200px',
-      textTransform: 'none',
+      padding: '8px',
+      // backgroundColor: theme.palette.secondary.dark,
+      // color: theme.palette.secondary.contrastText,
+      width: '175px',
+      // textTransform: 'none',
+    };
+
+    const formStyle = {
+      margin: theme.spacing.unit,
     };
 
     const [hoverX, hoverY] = idToCoords(hover);
     const ownerAddress = addresses[owners[hover]];
-    const ownerMessage = ownerAddress ? `${ownerAddress.slice(0, 10)}...` : 'Unowned!';
+    const ownerMessage = ownerAddress ? `${ownerAddress.slice(0, 15)}...` : 'Unowned';
 
     const price = prices[hover] === undefined ? initialPrice : prices[hover];
     const priceFormatted = this.props.web3.fromWei(price, 'ether').toString();
 
     return (
-      <Paper style={pixelDisplayStyle} elevation={4} square>
-        <Typography type="button">Pixel {hoverX} x {hoverY}</Typography>
-        <Typography type="button">Price (ETH) {priceFormatted}</Typography>
-        <Typography type="button">Owner {ownerMessage}</Typography>
+      <Paper style={pixelDisplayStyle} elevation={6}>
+        <FormControl disabled style={formStyle}>
+          <InputLabel htmlFor="name-disabled">Pixel</InputLabel>
+          <Input id="name-disabled" value={`${hoverX} x ${hoverY}`} />
+        </FormControl>
+        <FormControl disabled style={formStyle}>
+          <InputLabel htmlFor="name-disabled">Price (ETH)</InputLabel>
+          <Input id="name-disabled" value={priceFormatted} />
+        </FormControl>
+        <FormControl disabled style={formStyle}>
+          <InputLabel htmlFor="name-disabled">Owner address</InputLabel>
+          <Input id="name-disabled" value={ownerMessage} />
+        </FormControl>
       </Paper>
     );
   }
@@ -122,7 +137,7 @@ class Home extends Component {
     };
 
     return (
-      <Button fab mini onClick={this.actions.openSettings} color="contrast" style={settingsStyle}>
+      <Button fab mini onClick={this.actions.openSettings} color="primary" style={settingsStyle}>
         <SettingsIcon />
       </Button>
     );
@@ -145,10 +160,10 @@ class Home extends Component {
 
     const action = (
       <div>
-        <Button color="accent" dense onClick={this.actions.onClearSelections}>
+        <Button color="primary" dense onClick={this.actions.onClearSelections}>
           Clear
         </Button>
-        <Button color="accent" dense onClick={purchase}>
+        <Button color="primary" dense onClick={purchase}>
           Purchase
         </Button>
       </div>

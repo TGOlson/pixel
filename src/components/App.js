@@ -5,7 +5,22 @@ import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 
 import Navbar from '../containers/Navbar';
 
-const theme = createMuiTheme();
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      light: '#ffffff',
+      main: '#fafafa',
+      dark: '#c7c7c7',
+      contrastText: '#000000',
+    },
+    secondary: {
+      light: '#7c43bd',
+      main: '#4a148c',
+      dark: '#12005e',
+      contrastText: '#ffffff',
+    },
+  },
+});
 
 window.theme = theme;
 

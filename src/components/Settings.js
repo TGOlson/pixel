@@ -33,8 +33,8 @@ const Settings = (props) => {
     />);
 
   return (
-    <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title">
-      <DialogTitle id="form-dialog-title" style={{ width: '500px' }}>Settings</DialogTitle>
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle style={{ width: '500px' }}>Settings</DialogTitle>
       <DialogContent>
         <FormGroup>
           <FormControlLabel control={showGridCheckbox} label="Show Grid" />
@@ -44,7 +44,7 @@ const Settings = (props) => {
         </FormGroup>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">Close</Button>
+        <Button onClick={onClose} color="inherit">Close</Button>
       </DialogActions>
     </Dialog>
   );

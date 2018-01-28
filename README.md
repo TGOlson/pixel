@@ -25,11 +25,16 @@ web3 todos
 
 todo
 
+* custom right click/long-press?
+  * show pixel
+  * show owner
+  * purchase/edit if owner
 * resize canvas on window resize
 * highlight section
 * display total price
 * filter by price
 * update material theme
+* https://material.io/color/#!/?view.left=0&view.right=0&primary.color=FAFAFA&secondary.color=4A148C
 * server?
 
 Note: max gas per block is current ~8m. Buying 10 pixels at once will take roughly 400k gas. This app should probably limit purchases to 10 at a time, or split purchases into groups of 10.
