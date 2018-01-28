@@ -2,19 +2,19 @@
 
 #### initial setup
 
+* Install [Ganache](http://truffleframework.com/ganache/)
+
 ```
 $ npm install
 $ npm install -g truffle
-$ truffle develop
-truffle(develop)> migrate
+$ truffle migrate
 ```
 
 #### dev
 
-```
-$ npm run dev
-$ truffle develop
-```
+* `npm run dev` to run dev server
+* `truffle compile` to compile contracts
+* `truffle migrate` to deploy contracts
 
 Open `http://localhost:8080/`
 
