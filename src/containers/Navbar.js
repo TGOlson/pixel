@@ -7,6 +7,14 @@ import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
+import IconButton from 'material-ui/IconButton';
+import MenuIcon from 'material-ui-icons/Menu';
+
+
+const menuIconStyle = {
+  marginLeft: -12,
+  marginRight: 20,
+};
 
 const titleStyle = {
   flex: 1,
@@ -19,6 +27,7 @@ const LinkToProfile = (address) => {
   return <Button component={Link} to={link} color="inherit">Profile</Button>;
 };
 
+
 const Navbar = ({ address }) => {
   const action = address
     ? LinkToProfile(address)
@@ -28,10 +37,12 @@ const Navbar = ({ address }) => {
     <div style={{ width: '100%', zIndex: 2 }}>
       <AppBar position="static">
         <Toolbar>
+          <IconButton style={menuIconStyle} color="inherit" aria-label="Menu">
+            <MenuIcon />
+          </IconButton>
           <Typography type="title" component={Link} to="/" color="inherit" style={titleStyle}>
             Pixel
           </Typography>
-          <Button component={Link} to="/about" color="inherit">About</Button>
           {action}
         </Toolbar>
       </AppBar>
@@ -47,6 +58,6 @@ Navbar.propTypes = {
   address: PropTypes.string,
 };
 
-const mapStateToProps = state => ({ address: state.user.address });
+const mapStateToProps = state => ({ ...state, address: state.user.address });
 
 export default connect(mapStateToProps)(Navbar);

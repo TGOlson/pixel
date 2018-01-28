@@ -217,6 +217,8 @@ export const getTransferEvents = id => (dispatch, getState) => {
   });
 };
 
+const isUserRejection = ({ message }) => message.includes('User denied transaction signature');
+
 export const purchasePixels = ids => (dispatch, getState) => {
   const state = getState();
   const from = state.user.address;
@@ -230,6 +232,9 @@ export const purchasePixels = ids => (dispatch, getState) => {
 
     pixelContract.purchaseMany(ids, { from, value, gas: gasEstimate + 2 }, (error, transaction) => {
       if (error) {
+        // Note: don't alert on user rejections
+        if (isUserRejection(error)) return;
+
         dispatch({
           type: 'PIXEL_PURCHASE_ERROR',
           payload: { error: error.message },

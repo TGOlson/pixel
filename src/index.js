@@ -8,7 +8,7 @@ import store from './store';
 
 import * as PixelActions from './actions/pixel';
 import { getNetworkId, getBlockNumber } from './actions/network';
-import { getAccounts } from './actions/user';
+import { getUserAddress, checkForAddressChange } from './actions/user';
 import { getWeb3 } from './actions/web3';
 import eventHandler from './eventHandler';
 
@@ -43,7 +43,7 @@ const initialLoadPromise = store.dispatch(getWeb3()).then(() => {
 
   return Promise.all([
     store.dispatch(getNetworkId(web3)),
-    store.dispatch(getAccounts(web3)),
+    store.dispatch(getUserAddress(web3)),
     store.dispatch(getBlockNumber(web3)),
   ]);
 }).then(() => setWindowDebugObjects());
@@ -70,6 +70,8 @@ const contractStatePromise = initialLoadPromise.then(() => {
       eventHandler(store.dispatch, event);
     }
   });
+
+  window.setInterval(() => store.dispatch(checkForAddressChange()), 1000);
 });
 
 store.dispatch({
