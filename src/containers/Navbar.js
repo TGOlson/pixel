@@ -16,13 +16,13 @@ const titleStyle = {
 const LinkToProfile = (address) => {
   const link = `/profile/${address}`;
 
-  return <Button component={Link} to={link} color="contrast">Profile</Button>;
+  return <Button component={Link} to={link} color="inherit">Profile</Button>;
 };
 
 const Navbar = ({ address }) => {
   const action = address
     ? LinkToProfile(address)
-    : <Button color="contrast">Login</Button>;
+    : <Button color="inherit">Login</Button>;
 
   return (
     <div style={{ width: '100%', zIndex: 2 }}>
@@ -31,7 +31,7 @@ const Navbar = ({ address }) => {
           <Typography type="title" component={Link} to="/" color="inherit" style={titleStyle}>
             Pixel
           </Typography>
-          <Button component={Link} to="/about" color="contrast">About</Button>
+          <Button component={Link} to="/about" color="inherit">About</Button>
           {action}
         </Toolbar>
       </AppBar>

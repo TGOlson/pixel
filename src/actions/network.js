@@ -9,4 +9,15 @@ export const getNetworkId = web3 => new Promise((resolve, reject) => {
   ));
 });
 
+export const getBlockNumber = web3 => new Promise((resolve, reject) => {
+  web3.eth.getBlockNumber((error, blockNumber) => (
+    error
+      ? reject(error)
+      : resolve({
+        type: 'BLOCK_NUMBER_FETCHED',
+        payload: { blockNumber },
+      })
+  ));
+});
+
 export default getNetworkId;

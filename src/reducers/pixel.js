@@ -26,6 +26,8 @@ const initialState = {
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
+    // Initial state /////////////////////////////////////////////////////////////////////////////////////////
+
     case 'PIXEL_STATES_FETCHED': {
       const { states } = payload;
       const hexValues = new Uint32Array(states.byteLength);
@@ -45,6 +47,46 @@ export default (state = initialState, { type, payload }) => {
       };
     }
 
+    // TODO: consider what format these prices should be stored in
+    case 'PIXEL_PRICES_FETCHED':
+      return { ...state, prices: payload.prices };
+
+    case 'PIXEL_OWNERS_FETCHED':
+      return { ...state, owners: payload.owners, addresses: payload.addresses };
+
+    case 'PIXEL_INITIAL_PRICE_FETCHED':
+      return { ...state, initialPrice: payload.initialPrice };
+
+    // State changes /////////////////////////////////////////////////////////////////////////////////////////
+
+    case 'PIXEL_TRANSFER': {
+      const { id, to } = payload;
+      const { owners, addresses } = state;
+
+      // Note: normally we don't want to mutate state values
+      // But here, mutating the underlying buffer is very fast
+      if (addresses[to] !== undefined) {
+        owners[id] = addresses[to];
+      } else {
+        const index = addresses.length;
+        addresses.push(to);
+        owners[id] = index;
+      }
+
+      return { ...state, lastUpdateReceived: new Date() };
+    }
+
+    case 'PIXEL_PRICE_CHANGE': {
+      const { id, price } = payload;
+      const { prices } = state;
+
+      // Note: normally we don't want to mutate state values
+      // But here, mutating the underlying buffer is very fast
+      prices[id] = price;
+
+      return { ...state, lastUpdateReceived: new Date() };
+    }
+
     case 'PIXEL_STATE_CHANGE': {
       const { id, state: pixelState } = payload;
       const { hexValues } = state;
@@ -56,15 +98,7 @@ export default (state = initialState, { type, payload }) => {
       return { ...state, lastUpdateReceived: new Date() };
     }
 
-    // TODO: consider what format these prices should be stored in
-    case 'PIXEL_PRICES_FETCHED':
-      return { ...state, prices: payload.prices };
-
-    case 'PIXEL_OWNERS_FETCHED':
-      return { ...state, owners: payload.owners, addresses: payload.addresses };
-
-    case 'PIXEL_INITIAL_PRICE_FETCHED':
-      return { ...state, initialPrice: payload.initialPrice };
+    // Pixel events //////////////////////////////////////////////////////////////////////////////////////////
 
     case 'STATE_EVENTS_FETCHED': {
       const { id, events } = payload;
@@ -92,6 +126,9 @@ export default (state = initialState, { type, payload }) => {
 
       return { ...state, transferEventsById: newTransferEventsById };
     }
+
+    // Transaction events ////////////////////////////////////////////////////////////////////////////////////
+    // TODO: probably a good candidate for another reducer
 
     case 'PIXEL_PURCHASE_SUCCESS':
       return { ...state, purchaseTransaction: payload.transaction };

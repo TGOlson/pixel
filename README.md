@@ -18,6 +18,10 @@ $ truffle migrate
 
 Open `http://localhost:8080/`
 
+web3 todos
+
+* poll for account change
+* warn if user is not signed in, but web3 is present
 
 todo
 

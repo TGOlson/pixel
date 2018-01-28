@@ -7,9 +7,10 @@ import { syncHistoryWithStore } from 'react-router-redux';
 import store from './store';
 
 import * as PixelActions from './actions/pixel';
-import { getNetworkId } from './actions/network';
+import { getNetworkId, getBlockNumber } from './actions/network';
 import { getAccounts } from './actions/user';
 import { getWeb3 } from './actions/web3';
+import eventHandler from './eventHandler';
 
 import App from './components/App';
 import Home from './containers/Home';
@@ -43,18 +44,32 @@ const initialLoadPromise = store.dispatch(getWeb3()).then(() => {
   return Promise.all([
     store.dispatch(getNetworkId(web3)),
     store.dispatch(getAccounts(web3)),
+    store.dispatch(getBlockNumber(web3)),
   ]);
 }).then(() => setWindowDebugObjects());
 
 const contractStatePromise = initialLoadPromise.then(() => {
   const contract = store.getState().contract.pixel;
+  const { blockNumber } = store.getState().network;
 
   return Promise.all([
-    store.dispatch(PixelActions.fetchPrices(contract)),
-    store.dispatch(PixelActions.fetchStates(contract)),
-    store.dispatch(PixelActions.fetchOwners(contract)),
-    store.dispatch(PixelActions.fetchInitialPrice(contract)),
-  ]);
+    store.dispatch(PixelActions.fetchPrices(contract, blockNumber)),
+    store.dispatch(PixelActions.fetchStates(contract, blockNumber)),
+    store.dispatch(PixelActions.fetchOwners(contract, blockNumber)),
+    store.dispatch(PixelActions.fetchInitialPrice(contract, blockNumber)),
+  ]).then(() => blockNumber);
+}).then((blockNumber) => {
+  const contract = store.getState().contract.pixel;
+
+  // Start watching for events after initial states have been fetched.
+  // Use the same blockNumber that was used to fetch initial state to make sure no events are missed.
+  contract.allEvents({ fromBlock: blockNumber }).watch((err, event) => {
+    if (err) {
+      console.error('Error handling event stream', err);
+    } else {
+      eventHandler(store.dispatch, event);
+    }
+  });
 });
 
 store.dispatch({

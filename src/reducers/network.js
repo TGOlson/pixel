@@ -1,5 +1,6 @@
 const initialState = {
   networkId: null,
+  blockNumber: 0,
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -30,6 +31,10 @@ export default (state = initialState, { type, payload }) => {
 
       return { ...state, networkId: payload.networkId };
     }
+
+    case 'BLOCK_NUMBER_FETCHED':
+      return { ...state, blockNumber: payload.blockNumber };
+
 
     default: return state;
   }

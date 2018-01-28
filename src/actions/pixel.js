@@ -34,14 +34,14 @@ export const fetchInitialPrice = pixelContract => new Promise((resolve, reject) 
 // TODO: this is obviously outrageous...
 // we can't fetch all contract events on each app load, but fine for dev
 // in the future we should provide some cached state known at block N, and apps just need to fetch from there
-export const fetchStates = pixelContract => new Promise((resolve) => {
+export const fetchStates = (pixelContract, toBlock) => new Promise((resolve) => {
   const buffer = new ArrayBuffer(1000 * 1000);
   const states = new Uint8ClampedArray(buffer);
   states.fill(0);
 
   // TODO: is fromBlock a bad idea? will results be too slow on the main net?
   // also, should at least update to when contract was deployed
-  const events = pixelContract.StateChange({}, { fromBlock: 0 });
+  const events = pixelContract.StateChange({}, { fromBlock: 0, toBlock });
 
   events.get((err, evs) => {
     evs.forEach(({ args }) => {
@@ -65,7 +65,7 @@ export const fetchStates = pixelContract => new Promise((resolve) => {
 //         payload: { buffer },
 //       }));
 
-export const fetchPrices = pixelContract => new Promise((resolve) => {
+export const fetchPrices = (pixelContract, toBlock) => new Promise((resolve) => {
   // TODO: can't realistically store 1M big numbers
   const prices = new Array(1000 * 1000);
   // const buffer = new ArrayBuffer(1000 * 1000 * 2);
@@ -74,7 +74,7 @@ export const fetchPrices = pixelContract => new Promise((resolve) => {
 
   // TODO: is fromBlock a bad idea? will results be too slow on the main net?
   // also, should at least update to when contract was deployed
-  const events = pixelContract.PriceChange({}, { fromBlock: 0 });
+  const events = pixelContract.PriceChange({}, { fromBlock: 0, toBlock });
 
   events.get((err, evs) => {
     evs.forEach(({ args }) => {
@@ -107,7 +107,7 @@ export const fetchPrices = pixelContract => new Promise((resolve) => {
 //         payload: { addresses },
 //       }));
 
-export const fetchOwners = pixelContract => new Promise((resolve) => {
+export const fetchOwners = (pixelContract, toBlock) => new Promise((resolve) => {
   const buffer = new ArrayBuffer(1000 * 1000);
   const owners = new Uint8ClampedArray(buffer);
   owners.fill(0);
@@ -117,7 +117,7 @@ export const fetchOwners = pixelContract => new Promise((resolve) => {
 
   // TODO: is fromBlock a bad idea? will results be too slow on the main net?
   // also, should at least update to when contract was deployed
-  const events = pixelContract.Transfer({}, { fromBlock: 0 });
+  const events = pixelContract.Transfer({}, { fromBlock: 0, toBlock });
 
   events.get((err, evs) => {
     evs.forEach(({ args }) => {

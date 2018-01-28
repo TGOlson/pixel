@@ -12,8 +12,8 @@
   "dependencies": {
     "d3-selection": "^1.2.0",
     "d3-zoom": "^1.7.1",
-    "material-ui": "^1.0.0-beta.28",
-    "material-ui-icons": "^1.0.0-beta.17",
+    "material-ui": "1.0.0-beta.28",
+    "material-ui-icons": "1.0.0-beta.17",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
