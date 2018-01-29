@@ -20,17 +20,17 @@ const SettingsMenu = (anchorEl, onClose) => (
       <Checkbox
         checked={true}
         disableRipple
-        style={{ color: '#7c43bd' }}
+        style={{ color: '#5efc82' }}
       />
-      <ListItemText inset primary="Show grid when zoomed" />
+      <ListItemText inset primary="Display grid when zoomed" />
     </MenuItem>
     <MenuItem onClick={(e, v) => console.log(e, v)}>
       <Checkbox
         checked={true}
         disableRipple
-        style={{ color: '#7c43bd' }}
+        style={{ color: '#5efc82' }}
       />
-      <ListItemText primary="Show pixel info" />
+      <ListItemText primary="Display pixel info on hover" />
     </MenuItem>
   </Menu>
 );
