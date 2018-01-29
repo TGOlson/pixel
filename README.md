@@ -25,9 +25,6 @@ web3 todos
 
 todo
 
-* update settings
-  * new list format
-  * show pixel info
 * custom right click/long-press?
   * show pixel
   * show owner
@@ -36,7 +33,6 @@ todo
 * highlight section
 * display total price
 * filter by price
-* update material theme
 * https://material.io/color/#!/?view.left=0&view.right=0&primary.color=FAFAFA&secondary.color=4A148C
 * server?
 

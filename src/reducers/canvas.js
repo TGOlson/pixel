@@ -8,7 +8,6 @@ const initialState = {
   showGrid: true,
   gridZoomLevel: 10,
   selected: [],
-  settingsOpen: false,
 
   // constants, could/should fetch from server
   dimensions: [DIMENSION, DIMENSION],

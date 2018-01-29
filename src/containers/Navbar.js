@@ -28,11 +28,34 @@ const LinkToProfile = (address) => {
   return <Button component={Link} to={link} color="inherit">Profile</Button>;
 };
 
+const Navbar = (props) => {
+  const {
+    mode,
+    address,
+    dispatch,
+    settingsOpen,
+    showGrid,
+    showPixelInfo,
+  } = props;
 
-const Navbar = ({ mode, address, dispatch }) => {
   const onModeChange = newMode => dispatch({
     type: 'NAVBAR_MODE_CHANGE',
     payload: { mode: newMode },
+  });
+
+  const onSettingsToggle = open => dispatch({
+    type: 'SETTINGS_MODAL_TOGGLE',
+    payload: { open },
+  });
+
+  const onShowGridChange = show => dispatch({
+    type: 'SHOW_GRID',
+    payload: { showGrid: show },
+  });
+
+  const onShowPixelInfoChange = show => dispatch({
+    type: 'SHOW_PIXEL_INFO',
+    payload: { showPixelInfo: show },
   });
 
   const action = address
@@ -52,8 +75,14 @@ const Navbar = ({ mode, address, dispatch }) => {
           {action}
         </Toolbar>
         <PixelToolbar
+          settingsOpen={settingsOpen}
+          onSettingsToggle={onSettingsToggle}
           mode={mode}
           onModeChange={onModeChange}
+          showGrid={showGrid}
+          onShowGridChange={onShowGridChange}
+          showPixelInfo={showPixelInfo}
+          onShowPixelInfoChange={onShowPixelInfoChange}
         />
       </AppBar>
     </div>
@@ -68,11 +97,15 @@ Navbar.propTypes = {
   dispatch: PropTypes.func.isRequired,
   address: PropTypes.string,
   mode: PropTypes.oneOf(['Color', 'Purchase']).isRequired,
+  settingsOpen: PropTypes.bool.isRequired,
+  showGrid: PropTypes.bool.isRequired,
+  showPixelInfo: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = state => ({
-  mode: state.navbar.mode,
+  ...state.navbar,
   address: state.user.address,
+  showGrid: state.canvas.showGrid,
 });
 
 export default connect(mapStateToProps)(Navbar);

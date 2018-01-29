@@ -3,23 +3,15 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { withTheme } from 'material-ui/styles';
 import Button from 'material-ui/Button';
-import Paper from 'material-ui/Paper';
-import Typography from 'material-ui/Typography';
 import Snackbar from 'material-ui/Snackbar';
-import SettingsIcon from 'material-ui-icons/Settings';
-import Input, { InputLabel } from 'material-ui/Input';
-import { FormControl } from 'material-ui/Form';
-
-import { idToCoords } from '../util/pixel';
 
 import { purchasePixels } from '../actions/pixel';
 
 import PixelCanvas from '../components/PixelCanvas';
+import PixelInfo from '../components/PixelInfo';
 import TransactionError from '../components/TransactionError';
 import TransactionSuccess from '../components/TransactionSuccess';
-import Settings from '../components/Settings';
 
 const actions = {
   onPixelHover: pixel => ({
@@ -47,15 +39,6 @@ const actions = {
     payload: null,
   }),
 
-  onShowGridChange: showGrid => ({
-    type: 'SHOW_GRID',
-    payload: { showGrid },
-  }),
-
-  openSettings: () => ({
-    type: 'SETTINGS_MODAL_OPEN',
-  }),
-
   onModalClose: () => ({
     type: 'MODAL_DISMISS',
   }),
@@ -75,68 +58,31 @@ class Home extends Component {
   }
 
   renderPixelDisplay() {
-    const { theme } = this.props;
+    const {
+      pixel,
+      web3,
+      navbar: { showPixelInfo },
+      canvas: { hover },
+    } = this.props;
+
     const {
       prices,
       owners,
       addresses,
       initialPrice,
-    } = this.props.pixel;
+    } = pixel;
 
-    const { hover } = this.props.canvas;
-
-    if (hover === null) return null;
-
-    const pixelDisplayStyle = {
-      position: 'absolute',
-      zIndex: 1,
-      margin: '8px',
-      padding: '8px',
-      width: '175px',
-    };
-
-    const formStyle = {
-      margin: theme.spacing.unit,
-    };
-
-    const [hoverX, hoverY] = idToCoords(hover);
-    const ownerAddress = addresses[owners[hover]];
-    const ownerMessage = ownerAddress ? `${ownerAddress.slice(0, 15)}...` : 'Unowned';
-
-    const price = prices[hover] === undefined ? initialPrice : prices[hover];
-    const priceFormatted = this.props.web3.fromWei(price, 'ether').toString();
+    if (hover === null || !showPixelInfo) return null;
 
     return (
-      <Paper style={pixelDisplayStyle} elevation={6}>
-        <FormControl disabled style={formStyle}>
-          <InputLabel htmlFor="name-disabled">Pixel</InputLabel>
-          <Input id="name-disabled" value={`${hoverX} x ${hoverY}`} />
-        </FormControl>
-        <FormControl disabled style={formStyle}>
-          <InputLabel htmlFor="name-disabled">Price (ETH)</InputLabel>
-          <Input id="name-disabled" value={priceFormatted} />
-        </FormControl>
-        <FormControl disabled style={formStyle}>
-          <InputLabel htmlFor="name-disabled">Owner address</InputLabel>
-          <Input id="name-disabled" value={ownerMessage} />
-        </FormControl>
-      </Paper>
-    );
-  }
-
-  renderSettings = () => {
-    const settingsStyle = {
-      position: 'absolute',
-      zIndex: 1,
-      right: 0,
-      bottom: 0,
-      margin: '8px',
-    };
-
-    return (
-      <Button fab mini onClick={this.actions.openSettings} color="primary" style={settingsStyle}>
-        <SettingsIcon />
-      </Button>
+      <PixelInfo
+        pixel={hover}
+        prices={prices}
+        owners={owners}
+        addresses={addresses}
+        initialPrice={initialPrice}
+        web3={web3}
+      />
     );
   }
 
@@ -203,11 +149,9 @@ class Home extends Component {
     const {
       purchaseSuccessModalOpen,
       purchaseErrorModalOpen,
-      settingsModalOpen,
     } = this.props.modal;
 
     const {
-      onShowGridChange,
       onPixelHover,
       onPixelSelect,
       onCanvasZoom,
@@ -227,20 +171,12 @@ class Home extends Component {
     };
 
     const pixelDisplay = this.renderPixelDisplay();
-    const settings = this.renderSettings();
     const selectedDisplay = this.renderSelected();
 
     return (
       <div style={containerStyle}>
         {selectedDisplay}
         {pixelDisplay}
-        {settings}
-        <Settings
-          open={settingsModalOpen}
-          onClose={onModalClose}
-          showGrid={showGrid}
-          onShowGridChange={onShowGridChange}
-        />
         <TransactionSuccess
           open={purchaseSuccessModalOpen}
           transactionId={purchaseTransaction}
@@ -272,13 +208,15 @@ class Home extends Component {
 
 Home.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  theme: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
   web3: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 
   modal: PropTypes.shape({
     purchaseSuccessModalOpen: PropTypes.bool.isRequired,
     purchaseErrorModalOpen: PropTypes.bool.isRequired,
-    settingsModalOpen: PropTypes.bool.isRequired,
+  }).isRequired,
+
+  navbar: PropTypes.shape({
+    showPixelInfo: PropTypes.bool.isRequired,
   }).isRequired,
 
   pixel: PropTypes.shape({
@@ -311,6 +249,7 @@ const mapStateToProps = state => ({
   modal: state.modal,
   pixel: state.pixel,
   web3: state.web3.instance,
+  navbar: state.navbar,
 });
 
-export default connect(mapStateToProps)(withTheme()(Home));
+export default connect(mapStateToProps)(Home);

@@ -10,26 +10,35 @@ import Tabs, { Tab } from 'material-ui/Tabs';
 import Menu, { MenuItem } from 'material-ui/Menu';
 import { ListItemText } from 'material-ui/List';
 
-const SettingsMenu = (anchorEl, onClose) => (
-  <Menu
-    anchorEl={anchorEl}
-    open={Boolean(anchorEl)}
-    onClose={onClose}
-  >
-    <MenuItem onClick={(e, v) => console.log(e, v)}>
-      <Checkbox
-        checked={true}
-        disableRipple
-        style={{ color: '#5efc82' }}
-      />
+const SettingsCheckbox = ({ checked }) => (
+  <Checkbox
+    checked={checked}
+    disableRipple
+    style={{ color: '#00c853' }}
+  />
+);
+
+SettingsCheckbox.propTypes = {
+  checked: PropTypes.bool.isRequired,
+};
+
+// TODO: should be real component
+const SettingsMenu = (
+  open,
+  anchorEl,
+  onClose,
+  showGrid,
+  onShowGridChange,
+  showPixelInfo,
+  onShowPixelInfoChange,
+) => (
+  <Menu anchorEl={anchorEl} open={open} onClose={onClose} >
+    <MenuItem onClick={() => onShowGridChange(!showGrid)}>
+      <SettingsCheckbox checked={showGrid} />
       <ListItemText inset primary="Display grid when zoomed" />
     </MenuItem>
-    <MenuItem onClick={(e, v) => console.log(e, v)}>
-      <Checkbox
-        checked={true}
-        disableRipple
-        style={{ color: '#5efc82' }}
-      />
+    <MenuItem onClick={() => onShowPixelInfoChange(!showPixelInfo)}>
+      <SettingsCheckbox checked={showPixelInfo} />
       <ListItemText primary="Display pixel info on hover" />
     </MenuItem>
   </Menu>
@@ -52,16 +61,34 @@ class PixelToolbar extends Component {
     }
   }
 
+  onSettingsOpen = (event) => {
+    this.props.onSettingsToggle(true);
+    this.setState({ el: event.currentTarget });
+  }
+
+  onSettingsClose = () => {
+    this.props.onSettingsToggle(false);
+    this.setState({ el: null });
+  }
+
   render() {
     const toolbarStyle = {
-      marginLeft: '24px',
-      marginRight: '24px',
+      // marginLeft: '24px',
+      // marginRight: '24px',
       marginTop: '-8px',
     };
 
     const itemStyle = {
       margin: 'auto',
     };
+
+    const {
+      settingsOpen,
+      showGrid,
+      onShowGridChange,
+      showPixelInfo,
+      onShowPixelInfoChange,
+    } = this.props;
 
     return (
       <Toolbar style={toolbarStyle}>
@@ -79,10 +106,18 @@ class PixelToolbar extends Component {
           <Tab label="Color" value="Color" />
           <Tab label="Marketplace" value="Purchase" />
         </Tabs>
-        <IconButton color="inherit" style={itemStyle} onClick={e => this.setState({ el: e.currentTarget })}>
+        <IconButton color="inherit" style={itemStyle} onClick={this.onSettingsOpen}>
           <SettingsIcon />
         </IconButton>
-        {SettingsMenu(this.state.el, () => this.setState({ el: null }))}
+        {SettingsMenu(
+          settingsOpen,
+          this.state.el,
+          this.onSettingsClose,
+          showGrid,
+          onShowGridChange,
+          showPixelInfo,
+          onShowPixelInfoChange,
+        )}
       </Toolbar>
     );
   }
@@ -91,6 +126,12 @@ class PixelToolbar extends Component {
 PixelToolbar.propTypes = {
   mode: PropTypes.oneOf(['Color', 'Purchase']).isRequired,
   onModeChange: PropTypes.func.isRequired,
+  onSettingsToggle: PropTypes.func.isRequired,
+  settingsOpen: PropTypes.bool.isRequired,
+  showGrid: PropTypes.bool.isRequired,
+  onShowGridChange: PropTypes.func.isRequired,
+  showPixelInfo: PropTypes.bool.isRequired,
+  onShowPixelInfoChange: PropTypes.func.isRequired,
 };
 
 
