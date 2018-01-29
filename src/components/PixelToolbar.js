@@ -3,9 +3,37 @@ import PropTypes from 'prop-types';
 
 import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
+import Checkbox from 'material-ui/Checkbox';
 import FilterListIcon from 'material-ui-icons/FilterList';
 import SettingsIcon from 'material-ui-icons/Settings';
 import Tabs, { Tab } from 'material-ui/Tabs';
+import Menu, { MenuItem } from 'material-ui/Menu';
+import { ListItemText } from 'material-ui/List';
+
+const SettingsMenu = (anchorEl, onClose) => (
+  <Menu
+    anchorEl={anchorEl}
+    open={Boolean(anchorEl)}
+    onClose={onClose}
+  >
+    <MenuItem onClick={(e, v) => console.log(e, v)}>
+      <Checkbox
+        checked={true}
+        disableRipple
+        style={{ color: '#7c43bd' }}
+      />
+      <ListItemText inset primary="Show grid when zoomed" />
+    </MenuItem>
+    <MenuItem onClick={(e, v) => console.log(e, v)}>
+      <Checkbox
+        checked={true}
+        disableRipple
+        style={{ color: '#7c43bd' }}
+      />
+      <ListItemText primary="Show pixel info" />
+    </MenuItem>
+  </Menu>
+);
 
 class PixelToolbar extends Component {
   constructor(props) {
@@ -51,9 +79,10 @@ class PixelToolbar extends Component {
           <Tab label="Color" value="Color" />
           <Tab label="Marketplace" value="Purchase" />
         </Tabs>
-        <IconButton color="inherit" style={itemStyle}>
+        <IconButton color="inherit" style={itemStyle} onClick={e => this.setState({ el: e.currentTarget })}>
           <SettingsIcon />
         </IconButton>
+        {SettingsMenu(this.state.el, () => this.setState({ el: null }))}
       </Toolbar>
     );
   }
