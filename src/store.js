@@ -8,6 +8,7 @@ import canvas from './reducers/canvas';
 import contract from './reducers/contract';
 import loadPromise from './reducers/loadPromise';
 import modal from './reducers/modal';
+import navbar from './reducers/navbar';
 import network from './reducers/network';
 import pixel from './reducers/pixel';
 import user from './reducers/user';
@@ -19,6 +20,7 @@ const reducer = combineReducers({
   contract,
   loadPromise,
   modal,
+  navbar,
   network,
   pixel,
   user,

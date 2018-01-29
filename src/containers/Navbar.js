@@ -10,6 +10,7 @@ import Button from 'material-ui/Button';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui-icons/Menu';
 
+import PixelToolbar from '../components/PixelToolbar';
 
 const menuIconStyle = {
   marginLeft: -12,
@@ -28,7 +29,12 @@ const LinkToProfile = (address) => {
 };
 
 
-const Navbar = ({ address }) => {
+const Navbar = ({ mode, address, dispatch }) => {
+  const onModeChange = newMode => dispatch({
+    type: 'NAVBAR_MODE_CHANGE',
+    payload: { mode: newMode },
+  });
+
   const action = address
     ? LinkToProfile(address)
     : <Button color="inherit">Login</Button>;
@@ -45,6 +51,10 @@ const Navbar = ({ address }) => {
           </Typography>
           {action}
         </Toolbar>
+        <PixelToolbar
+          mode={mode}
+          onModeChange={onModeChange}
+        />
       </AppBar>
     </div>
   );
@@ -55,9 +65,14 @@ Navbar.defaultProps = {
 };
 
 Navbar.propTypes = {
+  dispatch: PropTypes.func.isRequired,
   address: PropTypes.string,
+  mode: PropTypes.oneOf(['Color', 'Purchase']).isRequired,
 };
 
-const mapStateToProps = state => ({ ...state, address: state.user.address });
+const mapStateToProps = state => ({
+  mode: state.navbar.mode,
+  address: state.user.address,
+});
 
 export default connect(mapStateToProps)(Navbar);

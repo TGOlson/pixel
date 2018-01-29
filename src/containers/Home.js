@@ -92,10 +92,7 @@ class Home extends Component {
       zIndex: 1,
       margin: '8px',
       padding: '8px',
-      // backgroundColor: theme.palette.secondary.dark,
-      // color: theme.palette.secondary.contrastText,
       width: '175px',
-      // textTransform: 'none',
     };
 
     const formStyle = {

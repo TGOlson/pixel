@@ -1,11 +1,12 @@
 import PixelContractSpec from '../../build/contracts/Pixel.json';
 
-export const loadContract = (web3) => {
+export const loadContract = (web3, networkId) => {
   const PixelContract = web3.eth.contract(PixelContractSpec.abi);
 
   // TODO: use truffle-contract or something similar to help with contract loading
   // this will be especially useful in different environments
-  const pixelContract = PixelContract.at(PixelContractSpec.networks['4447'].address);
+  const { address } = PixelContractSpec.networks[networkId];
+  const pixelContract = PixelContract.at(address);
 
   return {
     type: 'PIXEL_CONTRACT_INITIALIZED',

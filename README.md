@@ -25,6 +25,9 @@ web3 todos
 
 todo
 
+* update settings
+  * new list format
+  * show pixel info
 * custom right click/long-press?
   * show pixel
   * show owner

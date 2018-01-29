@@ -39,13 +39,14 @@ const setWindowDebugObjects = () => {
 const initialLoadPromise = store.dispatch(getWeb3()).then(() => {
   const web3 = store.getState().web3.instance;
 
-  store.dispatch(PixelActions.loadContract(web3));
-
   return Promise.all([
     store.dispatch(getNetworkId(web3)),
     store.dispatch(getUserAddress(web3)),
     store.dispatch(getBlockNumber(web3)),
-  ]);
+  ]).then(() => {
+    const { networkId } = store.getState().network;
+    return store.dispatch(PixelActions.loadContract(web3, networkId));
+  });
 }).then(() => setWindowDebugObjects());
 
 const contractStatePromise = initialLoadPromise.then(() => {
@@ -56,7 +57,7 @@ const contractStatePromise = initialLoadPromise.then(() => {
     store.dispatch(PixelActions.fetchPrices(contract, blockNumber)),
     store.dispatch(PixelActions.fetchStates(contract, blockNumber)),
     store.dispatch(PixelActions.fetchOwners(contract, blockNumber)),
-    store.dispatch(PixelActions.fetchInitialPrice(contract, blockNumber)),
+    store.dispatch(PixelActions.fetchInitialPrice(contract)),
   ]).then(() => blockNumber);
 }).then((blockNumber) => {
   const contract = store.getState().contract.pixel;
