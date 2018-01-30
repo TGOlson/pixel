@@ -57,6 +57,44 @@ class Home extends Component {
     this.actions = bindActionCreators(actions, props.dispatch);
   }
 
+  calcHoveredPixel = () => {
+    const { mode, selectedColor } = this.props.navbar;
+    const { hover } = this.props.canvas;
+    const {
+      owners,
+      addresses,
+    } = this.props.pixel;
+
+    const { address } = this.props.user;
+    const toHexColor = x => `#${x.toString(16)}`;
+
+    // If no hover... then no hover
+    if (hover === null) return [];
+
+    // If in purchase mode, always same
+    if (mode === 'Purchase') return [[hover, '#ffffff4c']];
+
+    // If in color mode and current user doesn't own pixel, no hover
+    if (addresses[owners[hover]] !== address) return [];
+
+    // Hover current color
+    return [[hover, toHexColor(selectedColor)]];
+  }
+
+  calcModifiedPixels = () => {
+    const {
+      hover,
+      selected,
+    } = this.props.canvas;
+
+    const hovered = this.calcHoveredPixel();
+
+    const modifiedSelected = selected.map(id =>
+      [id, id === hover ? '#4486f4b2' : '#4486f4ff']);
+
+    return [...hovered, ...modifiedSelected];
+  }
+
   renderPixelDisplay() {
     const {
       pixel,
@@ -139,7 +177,6 @@ class Home extends Component {
 
     const {
       hover,
-      selected,
       dimensions,
       transform,
       showGrid,
@@ -172,14 +209,7 @@ class Home extends Component {
 
     const pixelDisplay = this.renderPixelDisplay();
     const selectedDisplay = this.renderSelected();
-
-    const modifiedHover = (hover ? [hover] : []).map(id =>
-      [id, '#ffffff4c']);
-
-    const modifiedSelected = selected.map(id =>
-      [id, id === hover ? '#4486f4b2' : '#4486f4ff']);
-
-    const modifiedPixels = [...modifiedHover, ...modifiedSelected];
+    const modifiedPixels = this.calcModifiedPixels();
 
     return (
       <div style={containerStyle}>
@@ -225,6 +255,12 @@ Home.propTypes = {
 
   navbar: PropTypes.shape({
     showPixelInfo: PropTypes.bool.isRequired,
+    mode: PropTypes.oneOf(['Color', 'Purchase']).isRequired,
+    selectedColor: PropTypes.number.isRequired,
+  }).isRequired,
+
+  user: PropTypes.shape({
+    address: PropTypes.string,
   }).isRequired,
 
   pixel: PropTypes.shape({
@@ -258,6 +294,7 @@ const mapStateToProps = state => ({
   pixel: state.pixel,
   web3: state.web3.instance,
   navbar: state.navbar,
+  user: state.user,
 });
 
 export default connect(mapStateToProps)(Home);

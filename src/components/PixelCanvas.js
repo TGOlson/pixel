@@ -6,12 +6,10 @@ import { zoom } from 'd3-zoom';
 import { coordsToId, idToCoords } from '../util/pixel';
 
 class PixelCanvas extends Component {
-  static defaultProps = {
-    hover: null,
-  }
-
   constructor(props) {
     super(props);
+
+    this.state = { prevHover: null };
 
     // Note: don't use state here. Parts of the render cycle use lifecycle hooks
     // that aren't all compatible with setState.
@@ -139,11 +137,10 @@ class PixelCanvas extends Component {
 
     canvas.on('mousemove', () => {
       const pixel = this.getCurrentPixel(true);
-      const { hover } = this.props;
 
-
-      if (pixel !== hover) {
+      if (pixel !== this.state.prevHover) {
         onPixelHover(pixel);
+        this.setState({ prevHover: pixel });
       }
     });
 
@@ -231,7 +228,6 @@ class PixelCanvas extends Component {
 
   renderInteractiveCanvas = () => {
     const {
-      hover,
       modifiedPixels,
       transform: { x, y, k },
       dimensions: [imageX, imageY],
@@ -253,14 +249,6 @@ class PixelCanvas extends Component {
 
     context.translate(x, y);
     context.scale(k, k);
-
-    // render hovered pixels
-    if (hover !== null) {
-      const [hoverX, hoverY] = idToCoords(hover);
-      context.fillStyle = 'white';
-      context.globalAlpha = '0.3';
-      context.fillRect(hoverX + offsetX, hoverY + offsetY, 1, 1);
-    }
 
     modifiedPixels.forEach(([id, rgbaHex]) => {
       const [modifiedX, modifiedY] = idToCoords(id);
@@ -341,7 +329,6 @@ class PixelCanvas extends Component {
 
 
 PixelCanvas.propTypes = {
-  hover: PropTypes.number,
   modifiedPixels: PropTypes.arrayOf(PropTypes.array).isRequired,
   onPixelHover: PropTypes.func.isRequired,
   onPixelSelect: PropTypes.func.isRequired,

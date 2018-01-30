@@ -35,6 +35,7 @@ const Navbar = (props) => {
     dispatch,
     showGrid,
     showPixelInfo,
+    selectedColor,
   } = props;
 
   const onModeChange = newMode => dispatch({
@@ -50,6 +51,11 @@ const Navbar = (props) => {
   const onShowPixelInfoChange = show => dispatch({
     type: 'SHOW_PIXEL_INFO',
     payload: { showPixelInfo: show },
+  });
+
+  const onColorSelectChange = color => dispatch({
+    type: 'COLOR_SELECT_CHANGE',
+    payload: { color },
   });
 
   const action = address
@@ -75,6 +81,8 @@ const Navbar = (props) => {
           onShowGridChange={onShowGridChange}
           showPixelInfo={showPixelInfo}
           onShowPixelInfoChange={onShowPixelInfoChange}
+          selectedColor={selectedColor}
+          onColorSelectChange={onColorSelectChange}
         />
       </AppBar>
     </div>
@@ -91,6 +99,7 @@ Navbar.propTypes = {
   mode: PropTypes.oneOf(['Color', 'Purchase']).isRequired,
   showGrid: PropTypes.bool.isRequired,
   showPixelInfo: PropTypes.bool.isRequired,
+  selectedColor: PropTypes.number.isRequired,
 };
 
 const mapStateToProps = state => ({

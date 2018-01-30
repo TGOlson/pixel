@@ -1,25 +1,20 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import Checkbox from 'material-ui/Checkbox';
 import Menu, { MenuItem } from 'material-ui/Menu';
-import { ListItemText } from 'material-ui/List';
 import Button from 'material-ui/Button';
-// import SettingsIcon from 'material-ui-icons/Settings';
 
+const toHexColor = x => `#${x.toString(16)}`;
 
-const SettingsCheckbox = ({ checked }) => (
-  <Checkbox
-    checked={checked}
-    disableRipple
-    style={{ color: '#00c853' }}
+const ColorSquare = ({ dimension, hex }) => (
+  <span style={{
+    width: `${dimension}px`,
+    height: `${dimension}px`,
+    backgroundColor: toHexColor(hex),
+    borderRadius: '2px',
+  }}
   />
 );
-
-SettingsCheckbox.propTypes = {
-  checked: PropTypes.bool.isRequired,
-};
-
 
 class ColorSelector extends Component {
   constructor(props) {
@@ -28,44 +23,55 @@ class ColorSelector extends Component {
     this.state = { open: false };
   }
 
+  select = x => () => {
+    this.props.onChange(x);
+    this.toggle(false)();
+  }
+
   toggle = open => () => this.setState({ open })
 
   render() {
-    // const {
-    //   selected,
-    //   onChange,
-    // } = this.props;
+    const {
+      selected,
+      options,
+    } = this.props;
 
     const { open } = this.state;
 
-    const buttonStyle = {
-      margin: 'auto',
-      minWidth: '27px',
-      minHeight: '27px',
-      padding: '3px',
+    const menuListStyle = {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+      maxWidth: '464px',
     };
 
-    const colorStyle = {
-      width: '24px',
-      height: '24px',
-      backgroundColor: '#a54242ff',
-      borderRadius: '2px',
+    const optionButtonStyle = {
+      padding: '8px',
+      minWidth: '27px',
+      minHeight: '27px',
     };
+
+    const optionElements = options.map(x => (
+      <Button key={x} style={optionButtonStyle} onClick={this.select(x)}>
+        <ColorSquare dimension={40} hex={x} />
+      </Button>
+    ));
 
     return (
       <div>
         <span ref={(el) => { this.anchorEl = el; }}>
-          <Button raised color="primary" style={buttonStyle} onClick={this.toggle(true)}>
-            <span style={colorStyle} />
+          <Button color="default" onClick={this.toggle(true)}>
+            <span style={{ marginRight: '8px' }}>Hue</span>
+            <ColorSquare dimension={24} hex={selected} />
           </Button>
         </span>
-        <Menu anchorEl={this.anchorEl} open={open} onClose={this.toggle(false)} >
-          <MenuItem onClick={() => console.log('click')}>
-            <ListItemText primary="Display grid when zoomed" />
-          </MenuItem>
-          <MenuItem onClick={() => console.log('click2')}>
-            <ListItemText primary="Display pixel info on hover" />
-          </MenuItem>
+        <Menu
+          anchorEl={this.anchorEl}
+          open={open}
+          onClose={this.toggle(false)}
+          style={{ marginTop: '56px' }}
+          MenuListProps={{ style: menuListStyle }}
+        >
+          {optionElements}
         </Menu>
       </div>
     );
@@ -73,7 +79,8 @@ class ColorSelector extends Component {
 }
 
 ColorSelector.propTypes = {
-  selected: PropTypes.string.isRequired,
+  selected: PropTypes.number.isRequired,
+  options: PropTypes.arrayOf(PropTypes.number).isRequired,
   onChange: PropTypes.func.isRequired,
 };
 

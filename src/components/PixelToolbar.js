@@ -6,6 +6,7 @@ import IconButton from 'material-ui/IconButton';
 import FilterListIcon from 'material-ui-icons/FilterList';
 import Tabs, { Tab } from 'material-ui/Tabs';
 
+import { PIXEL_COLORS_HEX } from '../util/constants';
 import ColorSelector from './ColorSelector';
 import SettingsMenu from './SettingsMenu';
 
@@ -16,6 +17,8 @@ const PixelToolbar = (props) => {
     onShowGridChange,
     showPixelInfo,
     onShowPixelInfoChange,
+    onColorSelectChange,
+    selectedColor,
   } = props;
 
   const onModeChange = (event, newMode) =>
@@ -37,15 +40,17 @@ const PixelToolbar = (props) => {
     </IconButton>
   );
 
-  const actions = (
-    <ColorSelector
-      open={true}
-      selected="foo"
-      onClose={() => console.log('close')}
-      onChange={(c) => console.log('change', c)}
-    />
+  const colorSelector = (
+    <span style={itemStyle}>
+      <ColorSelector
+        selected={selectedColor}
+        options={PIXEL_COLORS_HEX}
+        onChange={onColorSelectChange}
+      />
+    </span>
   );
-  // const actions = mode === 'Color' ? colorSelector : filterItems;
+
+  const actions = mode === 'Color' ? colorSelector : filterItems;
 
   return (
     <Toolbar style={toolbarStyle}>
@@ -80,6 +85,8 @@ PixelToolbar.propTypes = {
   onShowGridChange: PropTypes.func.isRequired,
   showPixelInfo: PropTypes.bool.isRequired,
   onShowPixelInfoChange: PropTypes.func.isRequired,
+  selectedColor: PropTypes.number.isRequired,
+  onColorSelectChange: PropTypes.func.isRequired,
 };
 
 
