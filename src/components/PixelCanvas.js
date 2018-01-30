@@ -232,7 +232,7 @@ class PixelCanvas extends Component {
   renderInteractiveCanvas = () => {
     const {
       hover,
-      selected,
+      modifiedPixels,
       transform: { x, y, k },
       dimensions: [imageX, imageY],
       showGrid,
@@ -262,13 +262,16 @@ class PixelCanvas extends Component {
       context.fillRect(hoverX + offsetX, hoverY + offsetY, 1, 1);
     }
 
-    // render selected pixels
-    context.fillStyle = 'blue';
-    context.globalAlpha = '1.0';
+    modifiedPixels.forEach(([id, rgbaHex]) => {
+      const [modifiedX, modifiedY] = idToCoords(id);
 
-    selected.forEach((id) => {
-      const [selectedX, selectedY] = idToCoords(id);
-      context.fillRect(selectedX + offsetX, selectedY + offsetY, 1, 1);
+      const color = rgbaHex.slice(0, 7);
+      const alpha = parseInt(rgbaHex.slice(7), 16) / 255;
+
+      context.fillStyle = color;
+      context.globalAlpha = alpha;
+
+      context.fillRect(modifiedX + offsetX, modifiedY + offsetY, 1, 1);
     });
 
     context.restore();
@@ -339,7 +342,7 @@ class PixelCanvas extends Component {
 
 PixelCanvas.propTypes = {
   hover: PropTypes.number,
-  selected: PropTypes.arrayOf(PropTypes.number).isRequired,
+  modifiedPixels: PropTypes.arrayOf(PropTypes.array).isRequired,
   onPixelHover: PropTypes.func.isRequired,
   onPixelSelect: PropTypes.func.isRequired,
   onZoom: PropTypes.func.isRequired,

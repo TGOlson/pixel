@@ -61,7 +61,7 @@ class Home extends Component {
     const {
       pixel,
       web3,
-      navbar: { showPixelInfo },
+      navbar: { showPixelInfo, mode },
       canvas: { hover },
     } = this.props;
 
@@ -72,7 +72,7 @@ class Home extends Component {
       initialPrice,
     } = pixel;
 
-    if (hover === null || !showPixelInfo) return null;
+    if (hover === null || !showPixelInfo || mode === 'Color') return null;
 
     return (
       <PixelInfo
@@ -173,6 +173,14 @@ class Home extends Component {
     const pixelDisplay = this.renderPixelDisplay();
     const selectedDisplay = this.renderSelected();
 
+    const modifiedHover = (hover ? [hover] : []).map(id =>
+      [id, '#ffffff4c']);
+
+    const modifiedSelected = selected.map(id =>
+      [id, id === hover ? '#4486f4b2' : '#4486f4ff']);
+
+    const modifiedPixels = [...modifiedHover, ...modifiedSelected];
+
     return (
       <div style={containerStyle}>
         {selectedDisplay}
@@ -189,7 +197,7 @@ class Home extends Component {
         />
         <PixelCanvas
           hover={hover}
-          selected={selected}
+          modifiedPixels={modifiedPixels}
           imageData={imageData}
           dimensions={dimensions}
           transform={transform}
