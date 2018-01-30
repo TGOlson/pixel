@@ -3,75 +3,32 @@ import PropTypes from 'prop-types';
 
 import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
-import Checkbox from 'material-ui/Checkbox';
 import FilterListIcon from 'material-ui-icons/FilterList';
 import SettingsIcon from 'material-ui-icons/Settings';
 import Tabs, { Tab } from 'material-ui/Tabs';
-import Menu, { MenuItem } from 'material-ui/Menu';
-import { ListItemText } from 'material-ui/List';
 
-const SettingsCheckbox = ({ checked }) => (
-  <Checkbox
-    checked={checked}
-    disableRipple
-    style={{ color: '#00c853' }}
-  />
-);
-
-SettingsCheckbox.propTypes = {
-  checked: PropTypes.bool.isRequired,
-};
-
-// TODO: should be real component
-const SettingsMenu = (
-  open,
-  anchorEl,
-  onClose,
-  showGrid,
-  onShowGridChange,
-  showPixelInfo,
-  onShowPixelInfoChange,
-) => (
-  <Menu anchorEl={anchorEl} open={open} onClose={onClose} >
-    <MenuItem onClick={() => onShowGridChange(!showGrid)}>
-      <SettingsCheckbox checked={showGrid} />
-      <ListItemText inset primary="Display grid when zoomed" />
-    </MenuItem>
-    <MenuItem onClick={() => onShowPixelInfoChange(!showPixelInfo)}>
-      <SettingsCheckbox checked={showPixelInfo} />
-      <ListItemText primary="Display pixel info on hover" />
-    </MenuItem>
-  </Menu>
-);
+import SettingsMenu from './SettingsMenu';
 
 class PixelToolbar extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = { mode: props.mode };
-  }
-
-  onModeChange = (event, mode) => {
-    // TODO: using internal state here in an attempt to get the tab animations to work
-    // however, this doesn't seem to help.
-    // consider switching back to a pure component...
-    if (mode !== this.state.mode) {
-      this.setState({ mode });
-      this.props.onModeChange(mode);
-    }
-  }
-
-  onSettingsOpen = (event) => {
-    this.props.onSettingsToggle(true);
-    this.setState({ el: event.currentTarget });
-  }
-
-  onSettingsClose = () => {
-    this.props.onSettingsToggle(false);
-    this.setState({ el: null });
-  }
-
   render() {
+    const {
+      mode,
+      settingsOpen,
+      showGrid,
+      onShowGridChange,
+      showPixelInfo,
+      onShowPixelInfoChange,
+    } = this.props;
+
+    const onModeChange = (event, newMode) =>
+      this.props.onModeChange(newMode);
+
+    const onSettingsOpen = () =>
+      this.props.onSettingsToggle(true);
+
+    const onSettingsClose = () =>
+      this.props.onSettingsToggle(false);
+
     const toolbarStyle = {
       // marginLeft: '24px',
       // marginRight: '24px',
@@ -82,13 +39,7 @@ class PixelToolbar extends Component {
       margin: 'auto',
     };
 
-    const {
-      settingsOpen,
-      showGrid,
-      onShowGridChange,
-      showPixelInfo,
-      onShowPixelInfoChange,
-    } = this.props;
+    const anchorEl = settingsOpen ? this.settingsMenuAnchorElement : null;
 
     return (
       <Toolbar style={toolbarStyle}>
@@ -97,8 +48,8 @@ class PixelToolbar extends Component {
         </IconButton>
         <Tabs
           style={itemStyle}
-          value={this.state.mode}
-          onChange={this.onModeChange}
+          value={mode}
+          onChange={onModeChange}
           indicatorColor="accent"
           textColor="inherit"
           fullWidth
@@ -106,18 +57,19 @@ class PixelToolbar extends Component {
           <Tab label="Color" value="Color" />
           <Tab label="Marketplace" value="Purchase" />
         </Tabs>
-        <IconButton color="inherit" style={itemStyle} onClick={this.onSettingsOpen}>
-          <SettingsIcon />
-        </IconButton>
-        {SettingsMenu(
-          settingsOpen,
-          this.state.el,
-          this.onSettingsClose,
-          showGrid,
-          onShowGridChange,
-          showPixelInfo,
-          onShowPixelInfoChange,
-        )}
+        <span style={itemStyle} ref={(el) => { this.settingsMenuAnchorElement = el; }}>
+          <IconButton color="inherit" style={itemStyle} onClick={onSettingsOpen}>
+            <SettingsIcon />
+          </IconButton>
+        </span>
+        <SettingsMenu
+          anchorEl={anchorEl}
+          onClose={onSettingsClose}
+          showGrid={showGrid}
+          onShowGridChange={onShowGridChange}
+          showPixelInfo={showPixelInfo}
+          onShowPixelInfoChange={onShowPixelInfoChange}
+        />
       </Toolbar>
     );
   }
