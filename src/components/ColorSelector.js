@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import Checkbox from 'material-ui/Checkbox';
 import Menu, { MenuItem } from 'material-ui/Menu';
 import { ListItemText } from 'material-ui/List';
-import IconButton from 'material-ui/IconButton';
-import SettingsIcon from 'material-ui-icons/Settings';
+import Button from 'material-ui/Button';
+// import SettingsIcon from 'material-ui-icons/Settings';
 
 
 const SettingsCheckbox = ({ checked }) => (
@@ -21,7 +21,7 @@ SettingsCheckbox.propTypes = {
 };
 
 
-class SettingsMenu extends Component {
+class ColorSelector extends Component {
   constructor(props) {
     super(props);
 
@@ -31,29 +31,39 @@ class SettingsMenu extends Component {
   toggle = open => () => this.setState({ open })
 
   render() {
-    const {
-      showGrid,
-      onShowGridChange,
-      showPixelInfo,
-      onShowPixelInfoChange,
-    } = this.props;
+    // const {
+    //   selected,
+    //   onChange,
+    // } = this.props;
 
     const { open } = this.state;
+
+    const buttonStyle = {
+      margin: 'auto',
+      minWidth: '27px',
+      minHeight: '27px',
+      padding: '3px',
+    };
+
+    const colorStyle = {
+      width: '24px',
+      height: '24px',
+      backgroundColor: '#a54242ff',
+      borderRadius: '2px',
+    };
 
     return (
       <div>
         <span ref={(el) => { this.anchorEl = el; }}>
-          <IconButton color="inherit" onClick={this.toggle(true)}>
-            <SettingsIcon />
-          </IconButton>
+          <Button raised color="primary" style={buttonStyle} onClick={this.toggle(true)}>
+            <span style={colorStyle} />
+          </Button>
         </span>
         <Menu anchorEl={this.anchorEl} open={open} onClose={this.toggle(false)} >
-          <MenuItem onClick={() => onShowGridChange(!showGrid)}>
-            <SettingsCheckbox checked={showGrid} />
+          <MenuItem onClick={() => console.log('click')}>
             <ListItemText primary="Display grid when zoomed" />
           </MenuItem>
-          <MenuItem onClick={() => onShowPixelInfoChange(!showPixelInfo)}>
-            <SettingsCheckbox checked={showPixelInfo} />
+          <MenuItem onClick={() => console.log('click2')}>
             <ListItemText primary="Display pixel info on hover" />
           </MenuItem>
         </Menu>
@@ -62,11 +72,9 @@ class SettingsMenu extends Component {
   }
 }
 
-SettingsMenu.propTypes = {
-  showGrid: PropTypes.bool.isRequired,
-  onShowGridChange: PropTypes.func.isRequired,
-  showPixelInfo: PropTypes.bool.isRequired,
-  onShowPixelInfoChange: PropTypes.func.isRequired,
+ColorSelector.propTypes = {
+  selected: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
 };
 
-export default SettingsMenu;
+export default ColorSelector;

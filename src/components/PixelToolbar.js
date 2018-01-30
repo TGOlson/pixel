@@ -1,85 +1,81 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
 import FilterListIcon from 'material-ui-icons/FilterList';
-import SettingsIcon from 'material-ui-icons/Settings';
 import Tabs, { Tab } from 'material-ui/Tabs';
 
+import ColorSelector from './ColorSelector';
 import SettingsMenu from './SettingsMenu';
 
-class PixelToolbar extends Component {
-  render() {
-    const {
-      mode,
-      settingsOpen,
-      showGrid,
-      onShowGridChange,
-      showPixelInfo,
-      onShowPixelInfoChange,
-    } = this.props;
+const PixelToolbar = (props) => {
+  const {
+    mode,
+    showGrid,
+    onShowGridChange,
+    showPixelInfo,
+    onShowPixelInfoChange,
+  } = props;
 
-    const onModeChange = (event, newMode) =>
-      this.props.onModeChange(newMode);
+  const onModeChange = (event, newMode) =>
+    props.onModeChange(newMode);
 
-    const onSettingsOpen = () =>
-      this.props.onSettingsToggle(true);
+  const toolbarStyle = {
+    // marginLeft: '24px',
+    // marginRight: '24px',
+    marginTop: '-8px',
+  };
 
-    const onSettingsClose = () =>
-      this.props.onSettingsToggle(false);
+  const itemStyle = {
+    margin: 'auto',
+  };
 
-    const toolbarStyle = {
-      // marginLeft: '24px',
-      // marginRight: '24px',
-      marginTop: '-8px',
-    };
+  const filterItems = (
+    <IconButton color="inherit" style={itemStyle}>
+      <FilterListIcon />
+    </IconButton>
+  );
 
-    const itemStyle = {
-      margin: 'auto',
-    };
+  const actions = (
+    <ColorSelector
+      open={true}
+      selected="foo"
+      onClose={() => console.log('close')}
+      onChange={(c) => console.log('change', c)}
+    />
+  );
+  // const actions = mode === 'Color' ? colorSelector : filterItems;
 
-    const anchorEl = settingsOpen ? this.settingsMenuAnchorElement : null;
-
-    return (
-      <Toolbar style={toolbarStyle}>
-        <IconButton color="inherit" style={itemStyle}>
-          <FilterListIcon />
-        </IconButton>
-        <Tabs
-          style={itemStyle}
-          value={mode}
-          onChange={onModeChange}
-          indicatorColor="accent"
-          textColor="inherit"
-          fullWidth
-        >
-          <Tab label="Color" value="Color" />
-          <Tab label="Marketplace" value="Purchase" />
-        </Tabs>
-        <span style={itemStyle} ref={(el) => { this.settingsMenuAnchorElement = el; }}>
-          <IconButton color="inherit" style={itemStyle} onClick={onSettingsOpen}>
-            <SettingsIcon />
-          </IconButton>
-        </span>
+  return (
+    <Toolbar style={toolbarStyle}>
+      {actions}
+      <Tabs
+        style={itemStyle}
+        value={mode}
+        onChange={onModeChange}
+        indicatorColor="accent"
+        textColor="inherit"
+        fullWidth
+      >
+        <Tab label="Color" value="Color" />
+        <Tab label="Marketplace" value="Purchase" />
+      </Tabs>
+      <span style={itemStyle}>
         <SettingsMenu
-          anchorEl={anchorEl}
-          onClose={onSettingsClose}
           showGrid={showGrid}
           onShowGridChange={onShowGridChange}
           showPixelInfo={showPixelInfo}
           onShowPixelInfoChange={onShowPixelInfoChange}
         />
-      </Toolbar>
-    );
-  }
-}
+      </span>
+    </Toolbar>
+  );
+};
 
 PixelToolbar.propTypes = {
   mode: PropTypes.oneOf(['Color', 'Purchase']).isRequired,
   onModeChange: PropTypes.func.isRequired,
-  onSettingsToggle: PropTypes.func.isRequired,
-  settingsOpen: PropTypes.bool.isRequired,
   showGrid: PropTypes.bool.isRequired,
   onShowGridChange: PropTypes.func.isRequired,
   showPixelInfo: PropTypes.bool.isRequired,

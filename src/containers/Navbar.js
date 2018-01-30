@@ -33,7 +33,6 @@ const Navbar = (props) => {
     mode,
     address,
     dispatch,
-    settingsOpen,
     showGrid,
     showPixelInfo,
   } = props;
@@ -41,11 +40,6 @@ const Navbar = (props) => {
   const onModeChange = newMode => dispatch({
     type: 'NAVBAR_MODE_CHANGE',
     payload: { mode: newMode },
-  });
-
-  const onSettingsToggle = open => dispatch({
-    type: 'SETTINGS_MODAL_TOGGLE',
-    payload: { open },
   });
 
   const onShowGridChange = show => dispatch({
@@ -75,8 +69,6 @@ const Navbar = (props) => {
           {action}
         </Toolbar>
         <PixelToolbar
-          settingsOpen={settingsOpen}
-          onSettingsToggle={onSettingsToggle}
           mode={mode}
           onModeChange={onModeChange}
           showGrid={showGrid}
@@ -97,7 +89,6 @@ Navbar.propTypes = {
   dispatch: PropTypes.func.isRequired,
   address: PropTypes.string,
   mode: PropTypes.oneOf(['Color', 'Purchase']).isRequired,
-  settingsOpen: PropTypes.bool.isRequired,
   showGrid: PropTypes.bool.isRequired,
   showPixelInfo: PropTypes.bool.isRequired,
 };
