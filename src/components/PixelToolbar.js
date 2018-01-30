@@ -32,29 +32,28 @@ const PixelToolbar = (props) => {
 
   const itemStyle = {
     margin: 'auto',
+    minWidth: '120px',
   };
 
   const filterItems = (
-    <IconButton color="inherit" style={itemStyle}>
+    <IconButton color="inherit">
       <FilterListIcon />
     </IconButton>
   );
 
   const colorSelector = (
-    <span style={itemStyle}>
-      <ColorSelector
-        selected={selectedColor}
-        options={PIXEL_COLORS_HEX}
-        onChange={onColorSelectChange}
-      />
-    </span>
+    <ColorSelector
+      selected={selectedColor}
+      options={PIXEL_COLORS_HEX}
+      onChange={onColorSelectChange}
+    />
   );
 
   const actions = mode === 'Color' ? colorSelector : filterItems;
 
   return (
     <Toolbar style={toolbarStyle}>
-      {actions}
+      <span style={{ ...itemStyle, textAlign: 'left' }}>{actions}</span>
       <Tabs
         style={itemStyle}
         value={mode}
@@ -66,7 +65,7 @@ const PixelToolbar = (props) => {
         <Tab label="Color" value="Color" />
         <Tab label="Marketplace" value="Purchase" />
       </Tabs>
-      <span style={itemStyle}>
+      <span style={{ ...itemStyle, textAlign: 'right' }}>
         <SettingsMenu
           showGrid={showGrid}
           onShowGridChange={onShowGridChange}
