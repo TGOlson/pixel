@@ -7,6 +7,7 @@ import Button from 'material-ui/Button';
 import Snackbar from 'material-ui/Snackbar';
 
 import { purchasePixels } from '../actions/pixel';
+import * as CanvasActions from '../actions/canvas';
 
 import PixelCanvas from '../components/PixelCanvas';
 import PixelInfo from '../components/PixelInfo';
@@ -34,10 +35,7 @@ const actions = {
     payload: { transform },
   }),
 
-  onCanvasZoomEnd: () => ({
-    type: 'CANVAS_ZOOM_END',
-    payload: null,
-  }),
+  onCanvasZoomEnd: CanvasActions.onCanvasZoomEnd,
 
   onModalClose: () => ({
     type: 'MODAL_DISMISS',

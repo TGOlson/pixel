@@ -1,6 +1,7 @@
 import { zoomIdentity } from 'd3-zoom';
 
 import { DIMENSION } from '../util/constants';
+import { pathToTransform } from '../util/url';
 
 const initialState = {
   hover: null,
@@ -23,22 +24,9 @@ export default (state = initialState, { type, payload }) => {
       return { ...state, transform: payload.transform };
 
     // TODO: canvas needs to be notified
+    // it ignores some events
     // case 'RESET_CANVAS':
     //   return { ...state, transform: zoomIdentity };
-
-    // TODO: should display current centered pixel
-    // case 'CANVAS_ZOOM_END': {
-    //   const { x, y, k } = state.transform;
-    //   // TODO: these should be the current centered coordinates
-    //   // /@40,100,1.5
-    //   const xx = Math.round(x / k);
-    //   const yy = Math.round(y / k);
-    //   const kk = round(2, k);
-    //
-    //   window.history.replaceState({}, 'foo', `/@${xx},${yy},${kk}`);
-    //
-    //   return state;
-    // }
 
     case 'SHOW_GRID':
       return { ...state, showGrid: payload.showGrid };
@@ -61,23 +49,22 @@ export default (state = initialState, { type, payload }) => {
     case 'PIXEL_PURCHASE_SUCCESS':
       return { ...state, selected: [] };
 
-    // TODO: not correct, needs to parse centered pixel
-    // case LOCATION_CHANGE: {
-    //   const path = payload.pathname;
-    //
-    //   // debugger;
-    //   if (path.indexOf('/@') >= 0) {
-    //     const tail = path.slice(2);
-    //     const tk = tail.split(',');
-    //     console.log(tk);
-    //     const transform = state.transform.translate(tk[0], tk[1]).scale(tk[2]);
-    //
-    //     return { ...state, transform };
-    //     // return state;
-    //   }
-    //
-    //   return state;
-    // }
+    // TODO: use router export
+    case '@@router/LOCATION_CHANGE': {
+      const path = payload.pathname;
+
+      // TODO: figure out better way to test path before attempting to parse
+      const maybeTransform = pathToTransform(path);
+
+      if (maybeTransform) {
+        const { x, y, k } = maybeTransform;
+        const transform = state.transform.translate(x, y).scale(k);
+
+        return { ...state, transform };
+      }
+
+      return state;
+    }
 
     default: return state;
   }
