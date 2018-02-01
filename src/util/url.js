@@ -13,7 +13,7 @@ export const pathToTransform = (path) => {
 
     const px = parseInt(pxStr, 10);
     const py = parseInt(pyStr, 10);
-    const k = parseInt(kStr, 10);
+    const k = parseFloat(kStr, 10);
 
     const x = (BASE_X - px) * k;
     const y = (BASE_Y - py) * k;

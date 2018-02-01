@@ -69,7 +69,7 @@ class PixelCanvas extends Component {
   }
 
   isTransformChange = ({ transform }) => {
-    const prevTransform = this.props;
+    const prevTransform = this.props.transform;
 
     return transform.x !== prevTransform.x ||
            transform.y !== prevTransform.y ||
@@ -270,24 +270,33 @@ class PixelCanvas extends Component {
 
       // increase linearly from k=10 to k=20
       // when k>20 stay contast with 2px grid lines
-      const lineWidth = Math.min(2, 1 + ((k - 10) / 10));
+      // const lineWidth = Math.min(2, 1 + ((k - 10) / 10));
+      const lineWidth = 1;
 
       // TODO: drawing from offsetX to viewX is probably overkill in a lot of cases
       // it is drawing a grid on the entire viewport
       // in some cases the image may not fill the entire view port
       // console.log(offsetY, y, k, y / k, y % k);
       // console.log(offsetY, y / k, (offsetY * k) + y);
-      const startY = Math.max(0, (offsetY * k) + y);
+      const dX = (offsetX * k) + x;
+      const dY = (offsetY * k) + y;
+      const startX = Math.max(0, dX);
+      const startY = Math.max(0, dY);
       // const endY = (offsetY * k) + y > 0 ? 0 : Math.abs((offsetY * k) + y);
 
-      // console.log(offsetY, y, k, (offsetY * k) + y);
-      // console.log(startY, endY);
-      for (let diffX = x % k; diffX < viewX; diffX += k) {
-        context.fillRect(diffX - 1, startY, lineWidth, viewY);
+      console.log(offsetX * k);
+      console.log(viewX, viewY);
+      console.log(dX, dY, startX, startY);
+      console.log(x, y, k);
+      for (let diffX = dX; diffX < viewX; diffX += k) {
+        // context.fillRect(diffX - 1, startY, lineWidth, viewY);
+        context.fillRect(diffX, startY, lineWidth, viewY);
       }
 
-      for (let diffY = y % k; diffY < viewY; diffY += k) {
-        context.fillRect(0, diffY - 1, viewX, lineWidth);
+
+      for (let diffY = dY; diffY < viewY; diffY += k) {
+        // context.fillRect(startX, diffY - 1, viewX, lineWidth);
+        context.fillRect(startX, diffY, viewX, lineWidth);
       }
     }
   }
