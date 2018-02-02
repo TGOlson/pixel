@@ -273,30 +273,23 @@ class PixelCanvas extends Component {
       // const lineWidth = Math.min(2, 1 + ((k - 10) / 10));
       const lineWidth = 1;
 
-      // TODO: drawing from offsetX to viewX is probably overkill in a lot of cases
-      // it is drawing a grid on the entire viewport
-      // in some cases the image may not fill the entire view port
-      // console.log(offsetY, y, k, y / k, y % k);
-      // console.log(offsetY, y / k, (offsetY * k) + y);
       const dX = (offsetX * k) + x;
       const dY = (offsetY * k) + y;
       const startX = Math.max(0, dX);
       const startY = Math.max(0, dY);
-      // const endY = (offsetY * k) + y > 0 ? 0 : Math.abs((offsetY * k) + y);
 
-      console.log(offsetX * k);
-      console.log(viewX, viewY);
-      console.log(dX, dY, startX, startY);
-      console.log(x, y, k);
-      for (let diffX = dX; diffX < viewX; diffX += k) {
+      const endX = Math.min(viewX, ((viewX - offsetX) * k) + x)
+      const endY = Math.min(viewY, ((viewY - offsetY) * k) + y)
+
+      for (let diffX = dX; diffX <= endX + 1; diffX += k) {
         // context.fillRect(diffX - 1, startY, lineWidth, viewY);
-        context.fillRect(diffX, startY, lineWidth, viewY);
+        context.fillRect(diffX, startY, lineWidth, endY);
       }
 
 
-      for (let diffY = dY; diffY < viewY; diffY += k) {
+      for (let diffY = dY; diffY <= endY + 1; diffY += k) {
         // context.fillRect(startX, diffY - 1, viewX, lineWidth);
-        context.fillRect(startX, diffY, viewX, lineWidth);
+        context.fillRect(startX, diffY, endX, lineWidth);
       }
     }
   }
