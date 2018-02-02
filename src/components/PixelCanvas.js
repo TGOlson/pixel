@@ -250,6 +250,7 @@ class PixelCanvas extends Component {
     context.translate(x, y);
     context.scale(k, k);
 
+    // draw modified pixels
     modifiedPixels.forEach(([id, rgbaHex]) => {
       const [modifiedX, modifiedY] = idToCoords(id);
 
@@ -268,9 +269,6 @@ class PixelCanvas extends Component {
     if (showGrid && k >= gridZoomLevel) {
       context.fillStyle = 'white';
 
-      // increase linearly from k=10 to k=20
-      // when k>20 stay contast with 2px grid lines
-      // const lineWidth = Math.min(2, 1 + ((k - 10) / 10));
       const lineWidth = 1;
 
       const dX = (offsetX * k) + x;
@@ -282,13 +280,11 @@ class PixelCanvas extends Component {
       const endY = Math.min(viewY, ((viewY - offsetY) * k) + y)
 
       for (let diffX = dX; diffX <= endX + 1; diffX += k) {
-        // context.fillRect(diffX - 1, startY, lineWidth, viewY);
         context.fillRect(diffX, startY, lineWidth, endY);
       }
 
 
       for (let diffY = dY; diffY <= endY + 1; diffY += k) {
-        // context.fillRect(startX, diffY - 1, viewX, lineWidth);
         context.fillRect(startX, diffY, endX, lineWidth);
       }
     }

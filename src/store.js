@@ -27,9 +27,14 @@ const reducer = combineReducers({
   web3,
 });
 
+const filterLogTypes = [
+  'PIXEL_HOVER',
+  'CANVAS_ZOOM',
+];
+
 const logger = createLogger({
   collapsed: true,
-  predicate: (getState, action) => action.type !== 'PIXEL_HOVER',
+  predicate: (getState, { type }) => !filterLogTypes.includes(type),
 });
 
 const store = createStore(
