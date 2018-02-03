@@ -1,4 +1,4 @@
-import { PIXEL_COLORS_HEX, PIXEL_COLORS_HEX_REVERSED } from '../util/constants';
+import { PIXEL_COLORS_HEX, PIXEL_COLORS_HEX_BYTES_REVERSED } from '../util/constants';
 
 export const getHex = (x) => {
   const hex = PIXEL_COLORS_HEX[x];
@@ -7,11 +7,11 @@ export const getHex = (x) => {
     throw new Error(`Unable to find predefined hex value for pixel state '${x}'`);
   }
 
-  return `#${hex.toString(16)}`;
+  return hex;
 };
 
 export const getHexBytesReversed = (x) => {
-  const hex = PIXEL_COLORS_HEX_REVERSED[x];
+  const hex = PIXEL_COLORS_HEX_BYTES_REVERSED[x];
 
   if (hex === undefined) {
     throw new Error(`Unable to find predefined hex value for pixel state '${x}'`);

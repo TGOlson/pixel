@@ -4,8 +4,6 @@ import PropTypes from 'prop-types';
 import Menu from 'material-ui/Menu';
 import Button from 'material-ui/Button';
 
-import { getHex } from '../util/color';
-
 const ColorSquare = ({ dimension, color }) => (
   <span style={{
     width: `${dimension}px`,
@@ -57,7 +55,7 @@ class ColorSelector extends Component {
 
     const optionElements = options.map((x, i) => (
       <Button key={x} style={optionButtonStyle} onClick={this.select(i)}>
-        <ColorSquare dimension={40} color={getHex(i)} />
+        <ColorSquare dimension={40} color={x} />
       </Button>
     ));
 
@@ -66,7 +64,7 @@ class ColorSelector extends Component {
         <span ref={(el) => { this.anchorEl = el; }}>
           <Button color="default" onClick={this.toggle(true)}>
             <span style={{ marginRight: '8px' }}>Hue</span>
-            <ColorSquare dimension={24} color={getHex(selected)} />
+            <ColorSquare dimension={24} color={options[selected]} />
           </Button>
         </span>
         <Menu
@@ -85,7 +83,7 @@ class ColorSelector extends Component {
 
 ColorSelector.propTypes = {
   selected: PropTypes.number.isRequired,
-  options: PropTypes.arrayOf(PropTypes.number).isRequired,
+  options: PropTypes.arrayOf(PropTypes.string).isRequired,
   onChange: PropTypes.func.isRequired,
 };
 
