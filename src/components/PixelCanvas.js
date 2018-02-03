@@ -277,8 +277,8 @@ class PixelCanvas extends Component {
       const startX = Math.max(0, dX);
       const startY = Math.max(0, dY);
 
-      const endX = Math.min(viewX, ((viewX - offsetX) * k) + x)
-      const endY = Math.min(viewY, ((viewY - offsetY) * k) + y)
+      const endX = Math.min(viewX, ((viewX - offsetX) * k) + x);
+      const endY = Math.min(viewY, ((viewY - offsetY) * k) + y);
 
       for (let diffX = dX; diffX <= endX + 1; diffX += k) {
         context.fillRect(diffX, startY, lineWidth, endY);

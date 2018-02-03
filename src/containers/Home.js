@@ -15,27 +15,7 @@ import TransactionError from '../components/TransactionError';
 import TransactionSuccess from '../components/TransactionSuccess';
 
 const actions = {
-  onPixelHover: pixel => ({
-    type: 'PIXEL_HOVER',
-    payload: { pixel },
-  }),
-
-  onPixelSelect: pixel => ({
-    type: 'PIXEL_SELECT',
-    payload: { pixel },
-  }),
-
-  onClearSelections: pixel => ({
-    type: 'CLEAR_SELECT',
-    payload: { pixel },
-  }),
-
-  onCanvasZoom: transform => ({
-    type: 'CANVAS_ZOOM',
-    payload: { transform },
-  }),
-
-  onCanvasZoomEnd: CanvasActions.onCanvasZoomEnd,
+  ...CanvasActions,
 
   onModalClose: () => ({
     type: 'MODAL_DISMISS',
@@ -79,18 +59,25 @@ class Home extends Component {
     return [[hover, toHexColor(selectedColor)]];
   }
 
-  calcModifiedPixels = () => {
+  calcSelectedPixels = () => {
+    const { mode } = this.props.navbar;
     const {
-      hover,
+      colored,
       selected,
     } = this.props.canvas;
 
+    const toHexColor = x => `#${x.toString(16)}`;
+
+    return mode === 'Purchase'
+      ? selected.map(id => [id, '#4486f4ff'])
+      : Object.keys(colored).map(id => [id, toHexColor(colored[id])]);
+  }
+
+  calcModifiedPixels = () => {
     const hovered = this.calcHoveredPixel();
+    const selected = this.calcSelectedPixels();
 
-    const modifiedSelected = selected.map(id =>
-      [id, id === hover ? '#4486f4b2' : '#4486f4ff']);
-
-    return [...hovered, ...modifiedSelected];
+    return [...selected, ...hovered];
   }
 
   renderPixelDisplay() {
@@ -274,6 +261,7 @@ Home.propTypes = {
 
   canvas: PropTypes.shape({
     hover: PropTypes.number,
+    colored: PropTypes.object.isRequired,
     selected: PropTypes.arrayOf(PropTypes.number).isRequired,
     dimensions: PropTypes.arrayOf(PropTypes.number).isRequired,
     transform: PropTypes.shape({

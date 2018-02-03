@@ -9,6 +9,7 @@ const initialState = {
   showGrid: true,
   gridZoomLevel: 10,
   selected: [],
+  colored: {},
 
   // constants, could/should fetch from server
   dimensions: [DIMENSION, DIMENSION],
@@ -41,6 +42,16 @@ export default (state = initialState, { type, payload }) => {
         : [...selected, payload.pixel];
 
       return { ...state, selected: newSelected };
+    }
+
+    case 'PIXEL_COLOR': {
+      const { colored } = state;
+      const { pixel, color } = payload;
+
+      return {
+        ...state,
+        colored: { ...colored, [pixel]: color },
+      };
     }
 
     case 'CLEAR_SELECT':
