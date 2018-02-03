@@ -263,6 +263,7 @@ class PixelCanvas extends Component {
       context.fillRect(modifiedX + offsetX, modifiedY + offsetY, 1, 1);
     });
 
+    context.globalAlpha = 1.0;
     context.restore();
 
     // render grid, if necessary

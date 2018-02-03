@@ -2,8 +2,8 @@ import { DIMENSION } from './constants';
 
 const round = (n, x) => Math.floor(x * (10 ** n)) / (10 ** n);
 
-const viewX = 800;
-const viewY = 656;
+const viewX = 900;
+const viewY = 678;
 
 const offsetX = (viewX - DIMENSION) / 2;
 const offsetY = (viewY - DIMENSION) / 2;
@@ -36,5 +36,5 @@ export const transformToPath = ({ x, y, k }) => {
 
   const kRounded = round(2, k);
 
-  return `/@${midPixelX},${midPixelX},${kRounded}`;
+  return `/@${midPixelX},${midPixelY},${kRounded}`;
 };

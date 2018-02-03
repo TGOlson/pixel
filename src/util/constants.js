@@ -28,21 +28,8 @@ export const PIXEL_COLORS_HEX = [
 ];
 
 // Note: this is used so that we can create an 8bit view on top of our 32bit array
-export const PIXEL_COLORS_HEX_REVERSED = [
-  0xffc5c8c6,
-  0xff282a2e,
-  0xffa54242,
-  0xff8c9440,
-  0xffde935f,
-  0xff5f819d,
-  0xff85678f,
-  0xff5e8d87,
-  0xff707880,
-  0xff373b41,
-  0xffcc6666,
-  0xffb5bd68,
-  0xfff0c674,
-  0xff81a2be,
-  0xffb294bb,
-  0xff8abeb7,
-];
+export const PIXEL_COLORS_HEX_REVERSED = PIXEL_COLORS_HEX.map((hex) => {
+  const [a, b, c, d, e, f, g, h] = hex.toString(16).split('');
+  const reversed = `${g}${h}${e}${f}${c}${d}${a}${b}`;
+  return parseInt(reversed, 16);
+});
