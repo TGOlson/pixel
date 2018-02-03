@@ -66,6 +66,7 @@ const contractStatePromise = initialLoadPromise.then(() => {
   // Use the same blockNumber that was used to fetch initial state to make sure no events are missed.
   contract.allEvents({ fromBlock: blockNumber }).watch((err, event) => {
     if (err) {
+      // TODO: ...?
       console.error('Error handling event stream', err);
     } else {
       eventHandler(store.dispatch, event);

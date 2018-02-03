@@ -220,7 +220,10 @@ export const getTransferEvents = id => (dispatch, getState) => {
 
 const isUserRejection = ({ message }) => message.includes('User denied transaction signature');
 
-export const purchasePixels = ids => (dispatch, getState) => {
+// TODO: this is gnarly!!!
+// cleanup once other contract methods are added
+// also... consider a new files for these
+export const purchase = ids => (dispatch, getState) => {
   const state = getState();
   const from = state.user.address;
   const pixelContract = state.contract.pixel;
@@ -243,6 +246,36 @@ export const purchasePixels = ids => (dispatch, getState) => {
       } else {
         dispatch({
           type: 'PIXEL_PURCHASE_SUCCESS',
+          payload: { transaction },
+        });
+      }
+    });
+  });
+};
+
+export const setStates = changes => (dispatch, getState) => {
+  const state = getState();
+  const from = state.user.address;
+  const pixelContract = state.contract.pixel;
+
+  const [ids, states] = changes.reduce(([idAcc, stAcc], [id, st]) =>
+    [[...idAcc, id], [...stAcc, st]], [[], []]);
+
+  pixelContract.setStates.estimateGas(ids, states, { from }, (estimateError, gasEstimate) => {
+    if (estimateError) throw estimateError;
+
+    pixelContract.setStates(ids, states, { from, gas: gasEstimate + 2 }, (error, transaction) => {
+      if (error) {
+        // Note: don't alert on user rejections
+        if (isUserRejection(error)) return;
+
+        dispatch({
+          type: 'PIXEL_SET_STATE_ERROR',
+          payload: { error: error.message },
+        });
+      } else {
+        dispatch({
+          type: 'PIXEL_SET_STATE_SUCCESS',
           payload: { transaction },
         });
       }

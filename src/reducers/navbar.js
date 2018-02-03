@@ -1,7 +1,7 @@
 const initialState = {
   mode: 'Purchase',
   showPixelInfo: true,
-  selectedColor: 0xf0c674ff,
+  selectedColor: 12,
 };
 
 export default (state = initialState, { type, payload }) => {

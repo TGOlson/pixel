@@ -8,7 +8,7 @@ const initialState = {
   hover: null,
   transform: zoomIdentity,
   showGrid: true,
-  gridZoomLevel: 10,
+  gridZoomLevel: 15,
   selected: [],
   colored: [],
 
@@ -66,6 +66,9 @@ export default (state = initialState, { type, payload }) => {
 
     case 'PIXEL_PURCHASE_SUCCESS':
       return { ...state, selected: [] };
+
+    case 'PIXEL_SET_STATE_SUCCESS':
+      return { ...state, colored: [] };
 
     case LOCATION_CHANGE: {
       const path = payload.pathname;

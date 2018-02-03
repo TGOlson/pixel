@@ -1,14 +1,5 @@
-import { DIMENSION, PIXEL_COLORS_HEX_REVERSED } from '../util/constants';
-
-const getPixelHex = (x) => {
-  const hex = PIXEL_COLORS_HEX_REVERSED[x];
-
-  if (hex === undefined) {
-    throw new Error(`Unable to find predefined hex value for pixel state '${x}'`);
-  }
-
-  return hex;
-};
+import { getHexBytesReversed } from '../util/color';
+import { DIMENSION } from '../util/constants';
 
 const initialState = {
   hexValues: null,
@@ -33,7 +24,7 @@ export default (state = initialState, { type, payload }) => {
       const hexValues = new Uint32Array(states.byteLength);
 
       states.forEach((x, i) => {
-        hexValues[i] = getPixelHex(x);
+        hexValues[i] = getHexBytesReversed(x);
       });
 
       const dataArray = new Uint8ClampedArray(hexValues.buffer);
@@ -93,7 +84,7 @@ export default (state = initialState, { type, payload }) => {
 
       // Note: normally we don't want to mutate state values
       // But here, mutating the underlying buffer is very fast
-      hexValues[id] = getPixelHex(pixelState);
+      hexValues[id] = getHexBytesReversed(pixelState);
 
       return { ...state, lastUpdateReceived: new Date() };
     }
@@ -134,6 +125,14 @@ export default (state = initialState, { type, payload }) => {
       return { ...state, purchaseTransaction: payload.transaction };
 
     case 'PIXEL_PURCHASE_ERROR':
+      return { ...state, purchaseError: payload.error };
+
+    // TODO: overloading purchase tx/error handling
+    // should make more generic
+    case 'PIXEL_SET_STATE_SUCCESS':
+      return { ...state, purchaseTransaction: payload.transaction };
+
+    case 'PIXEL_SET_STATE_ERROR':
       return { ...state, purchaseError: payload.error };
 
     default: return state;

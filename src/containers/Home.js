@@ -6,13 +6,15 @@ import PropTypes from 'prop-types';
 import Button from 'material-ui/Button';
 import Snackbar from 'material-ui/Snackbar';
 
-import { purchasePixels } from '../actions/pixel';
+import { purchase, setStates } from '../actions/pixel';
 import * as CanvasActions from '../actions/canvas';
 
 import PixelCanvas from '../components/PixelCanvas';
 import PixelInfo from '../components/PixelInfo';
 import TransactionError from '../components/TransactionError';
 import TransactionSuccess from '../components/TransactionSuccess';
+
+import { getHex } from '../util/color';
 
 const actions = {
   ...CanvasActions,
@@ -21,7 +23,8 @@ const actions = {
     type: 'MODAL_DISMISS',
   }),
 
-  purchase: purchasePixels,
+  purchase,
+  setStates,
 };
 
 class Home extends Component {
@@ -44,7 +47,6 @@ class Home extends Component {
     } = this.props.pixel;
 
     const { address } = this.props.user;
-    const toHexColor = x => `#${x.toString(16)}`;
 
     // If no hover... then no hover
     if (hover === null) return [];
@@ -56,7 +58,7 @@ class Home extends Component {
     if (addresses[owners[hover]] !== address) return [];
 
     // Hover current color
-    return [[hover, toHexColor(selectedColor)]];
+    return [[hover, getHex(selectedColor)]];
   }
 
   calcSelectedPixels = () => {
@@ -66,11 +68,9 @@ class Home extends Component {
       selected,
     } = this.props.canvas;
 
-    const toHexColor = x => `#${x.toString(16)}`;
-
     return mode === 'Purchase'
       ? selected.map(id => [id, '#4486f4ff'])
-      : colored.map(([id, x]) => [id, toHexColor(x)]);
+      : colored.map(([id, x]) => [id, getHex(x)]);
   }
 
   calcModifiedPixels = () => {
@@ -123,7 +123,9 @@ class Home extends Component {
     };
 
     // TODO: swap action depending on mode
-    const purchase = () => this.actions.purchase(selected);
+    const onAction = mode === 'Color'
+      ? () => this.actions.setStates(colored)
+      : () => this.actions.purchase(selected);
 
     const open = mode === 'Color'
       ? colored.length !== 0
@@ -147,7 +149,7 @@ class Home extends Component {
         <Button color="primary" dense onClick={onClear}>
           Clear
         </Button>
-        <Button color="primary" dense onClick={purchase}>
+        <Button color="primary" dense onClick={onAction}>
           {actionText}
         </Button>
       </div>

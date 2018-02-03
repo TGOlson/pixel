@@ -1,20 +1,25 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import Menu, { MenuItem } from 'material-ui/Menu';
+import Menu from 'material-ui/Menu';
 import Button from 'material-ui/Button';
 
-const toHexColor = x => `#${x.toString(16)}`;
+import { getHex } from '../util/color';
 
-const ColorSquare = ({ dimension, hex }) => (
+const ColorSquare = ({ dimension, color }) => (
   <span style={{
     width: `${dimension}px`,
     height: `${dimension}px`,
-    backgroundColor: toHexColor(hex),
+    backgroundColor: color,
     borderRadius: '2px',
   }}
   />
 );
+
+ColorSquare.propTypes = {
+  dimension: PropTypes.number.isRequired,
+  color: PropTypes.string.isRequired,
+};
 
 class ColorSelector extends Component {
   constructor(props) {
@@ -50,9 +55,9 @@ class ColorSelector extends Component {
       minHeight: '27px',
     };
 
-    const optionElements = options.map(x => (
-      <Button key={x} style={optionButtonStyle} onClick={this.select(x)}>
-        <ColorSquare dimension={40} hex={x} />
+    const optionElements = options.map((x, i) => (
+      <Button key={x} style={optionButtonStyle} onClick={this.select(i)}>
+        <ColorSquare dimension={40} color={getHex(i)} />
       </Button>
     ));
 
@@ -61,7 +66,7 @@ class ColorSelector extends Component {
         <span ref={(el) => { this.anchorEl = el; }}>
           <Button color="default" onClick={this.toggle(true)}>
             <span style={{ marginRight: '8px' }}>Hue</span>
-            <ColorSquare dimension={24} hex={selected} />
+            <ColorSquare dimension={24} color={getHex(selected)} />
           </Button>
         </span>
         <Menu
