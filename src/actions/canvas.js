@@ -10,7 +10,8 @@ export const onPixelHover = pixel => ({
 // however, this is a function that gets passed into the PixelCanvas component
 // which contains a lot of internal state, and generally ignores prop updates
 export const onPixelSelect = pixel => (dispatch, getState) => {
-  const { mode, selectedColor } = getState().navbar;
+  const state = getState();
+  const { mode, selectedColor } = state.navbar;
 
   if (mode === 'Color') {
     dispatch({
@@ -30,7 +31,12 @@ export const onPixelPurchase = pixel => ({
   payload: { pixel },
 });
 
-export const onClearSelections = pixel => ({
+export const onClearColored = pixel => ({
+  type: 'CLEAR_COLOR',
+  payload: { pixel },
+});
+
+export const onClearSelected = pixel => ({
   type: 'CLEAR_SELECT',
   payload: { pixel },
 });

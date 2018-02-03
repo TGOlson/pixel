@@ -1,4 +1,5 @@
 import { zoomIdentity } from 'd3-zoom';
+import { LOCATION_CHANGE } from 'react-router-redux';
 
 import { DIMENSION } from '../util/constants';
 import { pathToTransform } from '../util/url';
@@ -9,7 +10,7 @@ const initialState = {
   showGrid: true,
   gridZoomLevel: 10,
   selected: [],
-  colored: {},
+  colored: [],
 
   // constants, could/should fetch from server
   dimensions: [DIMENSION, DIMENSION],
@@ -48,20 +49,25 @@ export default (state = initialState, { type, payload }) => {
       const { colored } = state;
       const { pixel, color } = payload;
 
-      return {
-        ...state,
-        colored: { ...colored, [pixel]: color },
-      };
+      const index = colored.findIndex(([x]) => x === pixel);
+
+      const newColored = index >= 0
+        ? [...colored.slice(0, index), [pixel, color], ...colored.slice(index + 1)]
+        : [...colored, [pixel, color]];
+
+      return { ...state, colored: newColored };
     }
 
     case 'CLEAR_SELECT':
       return { ...state, selected: [] };
 
+    case 'CLEAR_COLOR':
+      return { ...state, colored: [] };
+
     case 'PIXEL_PURCHASE_SUCCESS':
       return { ...state, selected: [] };
 
-    // TODO: use router export
-    case '@@router/LOCATION_CHANGE': {
+    case LOCATION_CHANGE: {
       const path = payload.pathname;
 
       // TODO: figure out better way to test path before attempting to parse

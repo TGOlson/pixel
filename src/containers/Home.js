@@ -70,7 +70,7 @@ class Home extends Component {
 
     return mode === 'Purchase'
       ? selected.map(id => [id, '#4486f4ff'])
-      : Object.keys(colored).map(id => [id, toHexColor(colored[id])]);
+      : colored.map(([id, x]) => [id, toHexColor(x)]);
   }
 
   calcModifiedPixels = () => {
@@ -110,9 +110,9 @@ class Home extends Component {
   }
 
   renderSelected = () => {
-    const { selected } = this.props.canvas;
+    const { mode } = this.props.navbar;
+    const { selected, colored } = this.props.canvas;
 
-    const open = selected.length !== 0;
 
     const selectedStyle = {
       position: 'absolute',
@@ -122,21 +122,36 @@ class Home extends Component {
       zIndex: 1,
     };
 
+    // TODO: swap action depending on mode
     const purchase = () => this.actions.purchase(selected);
+
+    const open = mode === 'Color'
+      ? colored.length !== 0
+      : selected.length !== 0;
+
+    const actionText = mode === 'Color'
+      ? 'Submit'
+      : 'Purchase';
+
+    const message = mode === 'Color'
+      ? `${colored.length} Pixel${colored.length === 1 ? '' : 's'} colored!`
+      : `${selected.length} Pixel${selected.length === 1 ? '' : 's'} selected!`;
+
+
+    const onClear = mode === 'Color'
+      ? this.actions.onClearColored
+      : this.actions.onClearSelected;
 
     const action = (
       <div>
-        <Button color="primary" dense onClick={this.actions.onClearSelections}>
+        <Button color="primary" dense onClick={onClear}>
           Clear
         </Button>
         <Button color="primary" dense onClick={purchase}>
-          Purchase
+          {actionText}
         </Button>
       </div>
     );
-
-    const n = selected.length;
-    const message = `${n} Pixel${n === 1 ? '' : 's'} selected!`;
 
     return (
       <Snackbar
@@ -261,7 +276,7 @@ Home.propTypes = {
 
   canvas: PropTypes.shape({
     hover: PropTypes.number,
-    colored: PropTypes.object.isRequired,
+    colored: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
     selected: PropTypes.arrayOf(PropTypes.number).isRequired,
     dimensions: PropTypes.arrayOf(PropTypes.number).isRequired,
     transform: PropTypes.shape({

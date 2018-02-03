@@ -20,7 +20,6 @@ Open `http://localhost:8080/`
 
 web3 todos
 
-* poll for account change
 * warn if user is not signed in, but web3 is present
 
 todo
@@ -29,6 +28,8 @@ todo
   * show pixel
   * show owner
   * purchase/edit if owner
+* show warning if trying to color a pixel not owned by current user
+* show warning if trying to purchase a pixel already owned by current user
 * resize canvas on window resize
 * highlight section
 * display total price
