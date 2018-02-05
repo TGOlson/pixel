@@ -3,15 +3,52 @@ import PropTypes from 'prop-types';
 import { Link, withRouter } from 'react-router';
 import { connect } from 'react-redux';
 
-import List, { ListItem, ListItemText } from 'material-ui/List';
+import { ListItem, ListItemText } from 'material-ui/List';
 import Typography from 'material-ui/Typography';
 import Grid from 'material-ui/Grid';
 import Divider from 'material-ui/Divider';
+import Avatar from 'material-ui/Avatar';
+import AnnouncementIcon from 'material-ui-icons/Announcement';
 
 import ColorSquare from '../components/ColorSquare';
 
 import { idToCoords } from '../util/pixel';
 import { PIXEL_COLORS_HEX } from '../util/constants';
+
+const PixelItem = ({ id, state }) => {
+  const [x, y] = idToCoords(id);
+  const color = PIXEL_COLORS_HEX[state];
+
+  const pixelLink = `/pixel/${x}x${y}`;
+  const marketplaceLink = `/@${x},${y},60`;
+
+  const linkStyle = { textDecoration: 'none' };
+
+  const coords = (
+    <Typography type="subheading" component={Link} to={pixelLink} style={linkStyle}>
+      {`${x} x ${y}`}
+    </Typography>
+  );
+
+  // TODO: does this need a way to force the canvas into marketplace mode?
+  const marketplace = (
+    <Typography type="caption" component={Link} to={marketplaceLink} style={linkStyle}>
+      View in marketplace
+    </Typography>
+  );
+
+  return (
+    <ListItem>
+      <ColorSquare dimension={40} color={color} />
+      <ListItemText primary={coords} secondary={marketplace} />
+    </ListItem>
+  );
+};
+
+PixelItem.propTypes = {
+  id: PropTypes.number.isRequired,
+  state: PropTypes.number.isRequired,
+};
 
 const Profile = (props) => {
   const {
@@ -30,41 +67,21 @@ const Profile = (props) => {
   // TODO: this is a bit heavy. May want to cache this for subsequent renders/page loads
   const pixelIds = owners.reduce((acc, owner, id) => (owner === ownerIndex ? [...acc, id] : acc), []);
 
-  const getColor = id => PIXEL_COLORS_HEX[states[id]];
-  const getCoords = (id) => {
-    const [x, y] = idToCoords(id);
-    const to = `/pixel/${x}x${y}`;
-
-    return (
-      <Typography type="subheading" component={Link} to={to} style={{ textDecoration: 'none' }}>
-        {`${x} x ${y}`}
-      </Typography>
-    );
-  };
-
-  const link = (id) => {
-    const [x, y] = idToCoords(id);
-    const to = `/@${x},${y},60`;
-    return (
-      <Typography type="caption" component={Link} to={to} style={{ textDecoration: 'none' }}>
-        View in marketplace
-      </Typography>
-    );
-  };
-
   const pixels = pixelIds.length === 0
-    ? null
-    : pixelIds.map(id => (
-      <ListItem key={id}>
-        <ColorSquare dimension={40} color={getColor(id)} />
-        <ListItemText primary={getCoords(id)} secondary={link(id)} />
+    ? (
+      <ListItem>
+        <Avatar><AnnouncementIcon /></Avatar>
+        <ListItemText primary="This address does not own any pixels!" />
       </ListItem>
-    ));
+    )
+    : pixelIds.map(id => <PixelItem key={id} id={id} state={states[id]} />);
 
   const pixelCountStyle = {
     textAlign: 'right',
-    marginTop: '8px',
+    margin: '8px 0',
   };
+
+  const pixelCount = `${pixelIds.length} Pixel${pixelIds.length === 1 ? '' : 's'}`;
 
   return (
     <Grid style={{ margin: '40px 24px' }}>
@@ -72,8 +89,10 @@ const Profile = (props) => {
       <Typography type="subheading">{address}</Typography>
       <Typography type="display3" style={{ marginTop: '40px' }}>Pixels</Typography>
       <Divider />
-      <Typography type="subheading" style={pixelCountStyle}>{pixelIds.length} Pixels</Typography>
-      <List>{pixels}</List>
+      <Typography type="subheading" color="secondary" style={pixelCountStyle}>{pixelCount}</Typography>
+      <Grid container>
+        {pixels}
+      </Grid>
     </Grid>
   );
 };
