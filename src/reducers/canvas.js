@@ -78,7 +78,7 @@ export default (state = initialState, { type, payload }) => {
 
       if (maybeTransform) {
         const { x, y, k } = maybeTransform;
-        const transform = state.transform.translate(x, y).scale(k);
+        const transform = zoomIdentity.translate(x, y).scale(k);
 
         return { ...state, transform };
       }

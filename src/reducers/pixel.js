@@ -4,9 +4,11 @@ import { DIMENSION } from '../util/constants';
 const initialState = {
   hexValues: null,
   imageData: null,
+  states: null,
   prices: null,
   lastUpdateReceived: null,
   owners: null,
+  addresses: [],
   stateEventsById: {},
   priceEventsById: {},
   transferEventsById: {},
@@ -32,6 +34,7 @@ export default (state = initialState, { type, payload }) => {
 
       return {
         ...state,
+        states,
         imageData,
         hexValues,
         lastUpdateReceived: new Date(),

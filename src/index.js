@@ -16,7 +16,7 @@ import App from './components/App';
 import Home from './containers/Home';
 import About from './containers/About';
 import Profile from './containers/Profile';
-import Pixel from './containers/Pixel';
+import PixelDetails from './containers/PixelDetails';
 
 import './styles/index.less';
 
@@ -93,7 +93,7 @@ ReactDOM.render(
         <IndexRoute component={Home} />
         <Route path="/about" component={About} />
         <Route path="/profile/:address" component={Profile} />
-        <Route path="/pixel/:id" component={Pixel} />
+        <Route path="/pixel/:id" component={PixelDetails} />
         <Route path="/:coords" component={Home} />
       </Route>
     </Router>

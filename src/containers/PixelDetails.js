@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-// import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -9,7 +8,7 @@ import { coordsToId } from '../util/pixel';
 
 import { getSetStateEvents, getPriceChangeEvents, getTransferEvents } from '../actions/pixel';
 
-class Pixel extends Component {
+class PixelDetails extends Component {
   constructor(props) {
     super(props);
 
@@ -102,7 +101,7 @@ class Pixel extends Component {
   }
 }
 
-Pixel.propTypes = {
+PixelDetails.propTypes = {
   dispatch: PropTypes.func.isRequired,
 
   pixel: PropTypes.shape({
@@ -122,4 +121,4 @@ Pixel.propTypes = {
 
 const mapStateToProps = state => state;
 
-export default connect(mapStateToProps)(Pixel);
+export default connect(mapStateToProps)(PixelDetails);

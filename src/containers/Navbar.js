@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router';
+import { Link, withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -27,6 +27,9 @@ const LinkToProfile = (address) => {
 
   return <Button component={Link} to={link} color="inherit">Profile</Button>;
 };
+
+const isHomePage = path =>
+  path === '/' || path.includes('/@');
 
 const Navbar = (props) => {
   const {
@@ -62,6 +65,21 @@ const Navbar = (props) => {
     ? LinkToProfile(address)
     : <Button color="inherit">Login</Button>;
 
+  const toolbar = isHomePage(props.location.pathname)
+    ? (
+      <PixelToolbar
+        mode={mode}
+        onModeChange={onModeChange}
+        showGrid={showGrid}
+        onShowGridChange={onShowGridChange}
+        showPixelInfo={showPixelInfo}
+        onShowPixelInfoChange={onShowPixelInfoChange}
+        selectedColor={selectedColor}
+        onColorSelectChange={onColorSelectChange}
+      />
+    )
+    : null;
+
   return (
     <div style={{ width: '100%', zIndex: 2 }}>
       <AppBar position="static">
@@ -74,16 +92,7 @@ const Navbar = (props) => {
           </Typography>
           {action}
         </Toolbar>
-        <PixelToolbar
-          mode={mode}
-          onModeChange={onModeChange}
-          showGrid={showGrid}
-          onShowGridChange={onShowGridChange}
-          showPixelInfo={showPixelInfo}
-          onShowPixelInfoChange={onShowPixelInfoChange}
-          selectedColor={selectedColor}
-          onColorSelectChange={onColorSelectChange}
-        />
+        {toolbar}
       </AppBar>
     </div>
   );
@@ -95,6 +104,7 @@ Navbar.defaultProps = {
 
 Navbar.propTypes = {
   dispatch: PropTypes.func.isRequired,
+  location: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
   address: PropTypes.string,
   mode: PropTypes.oneOf(['Color', 'Purchase']).isRequired,
   showGrid: PropTypes.bool.isRequired,
@@ -103,9 +113,10 @@ Navbar.propTypes = {
 };
 
 const mapStateToProps = state => ({
+  ...state,
   ...state.navbar,
   address: state.user.address,
   showGrid: state.canvas.showGrid,
 });
 
-export default connect(mapStateToProps)(Navbar);
+export default connect(mapStateToProps)(withRouter(Navbar));
