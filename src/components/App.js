@@ -1,8 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+
 import Reboot from 'material-ui/Reboot';
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 
+import UnsupportedNetworkModal from '../components/UnsupportedNetworkModal';
 import Navbar from '../containers/Navbar';
 
 const theme = createMuiTheme({
@@ -30,18 +33,38 @@ const appStyle = {
   flexDirection: 'column',
 };
 
-const App = ({ children }) => (
-  <MuiThemeProvider theme={theme}>
-    <Reboot />
-    <div style={appStyle}>
-      <Navbar />
-      {children}
-    </div>
-  </MuiThemeProvider>
-);
+const App = (props) => {
+  const { network, children } = props;
+
+  // TODO: this is too high up!
+  // Probably need to allow individual pages to make this decision
+  const content = network.supported
+    ? children
+    : <UnsupportedNetworkModal id={network.networkId} name={network.networkName} />;
+
+  return (
+    <MuiThemeProvider theme={theme}>
+      <Reboot />
+      <div style={appStyle}>
+        <Navbar />
+        {content}
+      </div>
+    </MuiThemeProvider>
+  );
+};
 
 App.propTypes = {
+  network: PropTypes.shape({
+    networkId: PropTypes.string,
+    networkName: PropTypes.string,
+    supported: PropTypes.bool,
+  }).isRequired,
+
   children: PropTypes.node.isRequired,
 };
 
-export default App;
+const mapStateToProps = state => ({
+  network: state.network,
+});
+
+export default connect(mapStateToProps)(App);

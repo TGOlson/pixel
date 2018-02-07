@@ -49,6 +49,8 @@ const initialLoadPromise = store.dispatch(getWeb3()).then(() => {
   });
 }).then(() => setWindowDebugObjects());
 
+// TODO: components should initiate this promise if they rely on this data
+// allows for this promise to be conditionally run depending on other props
 const contractStatePromise = initialLoadPromise.then(() => {
   const contract = store.getState().contract.pixel;
   const { blockNumber } = store.getState().network;

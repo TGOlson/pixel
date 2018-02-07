@@ -12,12 +12,23 @@ export const onPixelHover = pixel => ({
 export const onPixelSelect = pixel => (dispatch, getState) => {
   const state = getState();
   const { mode, selectedColor } = state.navbar;
+  const { owners, addresses } = state.pixel;
+  const { address } = state.user;
 
   if (mode === 'Color') {
-    dispatch({
-      type: 'PIXEL_COLOR',
-      payload: { pixel, color: selectedColor },
-    });
+    const pixelOwner = addresses[owners[pixel]];
+
+    if (pixelOwner !== address) {
+      dispatch({
+        type: 'SET_ERROR_MODAL',
+        payload: { type: 'UNAUTHORIZED_PIXEL_EDIT', data: null },
+      });
+    } else {
+      dispatch({
+        type: 'PIXEL_COLOR',
+        payload: { pixel, color: selectedColor },
+      });
+    }
   } else {
     dispatch({
       type: 'PIXEL_SELECT',

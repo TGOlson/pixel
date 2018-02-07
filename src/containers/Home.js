@@ -11,6 +11,7 @@ import * as CanvasActions from '../actions/canvas';
 
 import PixelCanvas from '../components/PixelCanvas';
 import PixelInfo from '../components/PixelInfo';
+import ErrorModal from '../components/ErrorModal';
 import TransactionError from '../components/TransactionError';
 import TransactionSuccess from '../components/TransactionSuccess';
 
@@ -188,6 +189,7 @@ class Home extends Component {
     const {
       purchaseSuccessModalOpen,
       purchaseErrorModalOpen,
+      errorModal,
     } = this.props.modal;
 
     const {
@@ -213,8 +215,18 @@ class Home extends Component {
     const selectedDisplay = this.renderSelected();
     const modifiedPixels = this.calcModifiedPixels();
 
+    const closeErrorModal = () => this.props.dispatch({
+      type: 'SET_ERROR_MODAL',
+      payload: null,
+    });
+
+    const errorModalDisplay = errorModal
+      ? <ErrorModal type={errorModal.type} data={errorModal.data} onClose={closeErrorModal} />
+      : null;
+
     return (
       <div style={containerStyle}>
+        {errorModalDisplay}
         {selectedDisplay}
         {pixelDisplay}
         <TransactionSuccess
@@ -253,6 +265,10 @@ Home.propTypes = {
   modal: PropTypes.shape({
     purchaseSuccessModalOpen: PropTypes.bool.isRequired,
     purchaseErrorModalOpen: PropTypes.bool.isRequired,
+    errorModal: PropTypes.shape({
+      title: PropTypes.string,
+      data: PropTypes.object,
+    }),
   }).isRequired,
 
   navbar: PropTypes.shape({
