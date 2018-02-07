@@ -240,8 +240,11 @@ export const purchase = ids => (dispatch, getState) => {
         if (isUserRejection(error)) return;
 
         dispatch({
-          type: 'PIXEL_PURCHASE_ERROR',
-          payload: { error: error.message },
+          type: 'SET_ALERT_MODAL',
+          payload: {
+            type: 'PIXEL_PURCHASE_ERROR',
+            data: { error: error.message },
+          },
         });
       } else {
         dispatch({
@@ -270,8 +273,11 @@ export const setStates = changes => (dispatch, getState) => {
         if (isUserRejection(error)) return;
 
         dispatch({
-          type: 'PIXEL_SET_STATE_ERROR',
-          payload: { error: error.message },
+          type: 'SET_ALERT_MODAL',
+          payload: {
+            type: 'PIXEL_SET_STATE_ERROR',
+            data: { error: error.message },
+          },
         });
       } else {
         dispatch({

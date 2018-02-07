@@ -13,8 +13,6 @@ const initialState = {
   priceEventsById: {},
   transferEventsById: {},
   initialPrice: null,
-  purchaseError: null,
-  purchaseTransaction: null,
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -120,23 +118,6 @@ export default (state = initialState, { type, payload }) => {
 
       return { ...state, transferEventsById: newTransferEventsById };
     }
-
-    // Transaction events ////////////////////////////////////////////////////////////////////////////////////
-    // TODO: probably a good candidate for another reducer
-
-    case 'PIXEL_PURCHASE_SUCCESS':
-      return { ...state, purchaseTransaction: payload.transaction };
-
-    case 'PIXEL_PURCHASE_ERROR':
-      return { ...state, purchaseError: payload.error };
-
-    // TODO: overloading purchase tx/error handling
-    // should make more generic
-    case 'PIXEL_SET_STATE_SUCCESS':
-      return { ...state, purchaseTransaction: payload.transaction };
-
-    case 'PIXEL_SET_STATE_ERROR':
-      return { ...state, purchaseError: payload.error };
 
     default: return state;
   }

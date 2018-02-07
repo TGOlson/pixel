@@ -11,18 +11,12 @@ import * as CanvasActions from '../actions/canvas';
 
 import PixelCanvas from '../components/PixelCanvas';
 import PixelInfo from '../components/PixelInfo';
-import ErrorModal from '../components/ErrorModal';
-import TransactionError from '../components/TransactionError';
-import TransactionSuccess from '../components/TransactionSuccess';
+import AlertModal from '../components/AlertModal';
 
 import { getHex } from '../util/color';
 
 const actions = {
   ...CanvasActions,
-
-  onModalClose: () => ({
-    type: 'MODAL_DISMISS',
-  }),
 
   purchase,
   setStates,
@@ -174,8 +168,6 @@ class Home extends Component {
       prices,
       owners,
       lastUpdateReceived,
-      purchaseTransaction,
-      purchaseError,
     } = this.props.pixel;
 
     const {
@@ -186,18 +178,13 @@ class Home extends Component {
       gridZoomLevel,
     } = this.props.canvas;
 
-    const {
-      purchaseSuccessModalOpen,
-      purchaseErrorModalOpen,
-      errorModal,
-    } = this.props.modal;
+    const { alertModal } = this.props.modal;
 
     const {
       onPixelHover,
       onPixelSelect,
       onCanvasZoom,
       onCanvasZoomEnd,
-      onModalClose,
     } = this.actions;
 
     if (!imageData || !prices || !owners) {
@@ -215,30 +202,20 @@ class Home extends Component {
     const selectedDisplay = this.renderSelected();
     const modifiedPixels = this.calcModifiedPixels();
 
-    const closeErrorModal = () => this.props.dispatch({
-      type: 'SET_ERROR_MODAL',
+    const closeAlertModal = () => this.props.dispatch({
+      type: 'SET_ALERT_MODAL',
       payload: null,
     });
 
-    const errorModalDisplay = errorModal
-      ? <ErrorModal type={errorModal.type} data={errorModal.data} onClose={closeErrorModal} />
+    const alertModalDisplay = alertModal
+      ? <AlertModal type={alertModal.type} data={alertModal.data} onClose={closeAlertModal} />
       : null;
 
     return (
       <div style={containerStyle}>
-        {errorModalDisplay}
+        {alertModalDisplay}
         {selectedDisplay}
         {pixelDisplay}
-        <TransactionSuccess
-          open={purchaseSuccessModalOpen}
-          transactionId={purchaseTransaction}
-          onClose={onModalClose}
-        />
-        <TransactionError
-          open={purchaseErrorModalOpen}
-          message={purchaseError}
-          onClose={onModalClose}
-        />
         <PixelCanvas
           hover={hover}
           modifiedPixels={modifiedPixels}
@@ -263,9 +240,7 @@ Home.propTypes = {
   web3: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 
   modal: PropTypes.shape({
-    purchaseSuccessModalOpen: PropTypes.bool.isRequired,
-    purchaseErrorModalOpen: PropTypes.bool.isRequired,
-    errorModal: PropTypes.shape({
+    alertModal: PropTypes.shape({
       title: PropTypes.string,
       data: PropTypes.object,
     }),

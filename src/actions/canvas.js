@@ -20,7 +20,7 @@ export const onPixelSelect = pixel => (dispatch, getState) => {
 
     if (pixelOwner !== address) {
       dispatch({
-        type: 'SET_ERROR_MODAL',
+        type: 'SET_ALERT_MODAL',
         payload: { type: 'UNAUTHORIZED_PIXEL_EDIT', data: null },
       });
     } else {

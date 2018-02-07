@@ -14,7 +14,7 @@ import Dialog, {
 
 
 class TransactionError extends Component {
-  static defaultProps = { message: null }
+  static defaultProps = { message: 'unknown error' }
 
   constructor(props) {
     super(props);
@@ -46,14 +46,14 @@ class TransactionError extends Component {
   }
 
   render() {
-    const { open, onClose } = this.props;
+    const { onClose } = this.props;
     const { showDebug } = this.state;
 
     const debugLabel = showDebug ? 'Hide debug info' : 'Show debug info';
     const debugInfo = showDebug ? this.renderDebugInfo() : null;
 
     return (
-      <Dialog open={open} onClose={onClose}>
+      <Dialog open onClose={onClose}>
         <DialogTitle style={{ width: '500px' }}>Error submitting transaction</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -77,9 +77,8 @@ class TransactionError extends Component {
 }
 
 TransactionError.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
   message: PropTypes.string,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default TransactionError;

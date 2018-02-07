@@ -1,29 +1,44 @@
 const initialState = {
-  purchaseSuccessModalOpen: false,
-  purchaseErrorModalOpen: false,
-  errorModal: null,
+  alertModal: null,
 };
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
-    case 'SET_MODAL':
-      return { ...state, modal: payload.modal };
-
-    // TODO: clear other modals
+    // TODO: these could be broadcast as SET_ALERT_MODAL events
+    // no other reducer listens to these...
     case 'PIXEL_PURCHASE_SUCCESS':
-      return { ...state, purchaseSuccessModalOpen: true };
-
-    case 'PIXEL_PURCHASE_ERROR':
-      return { ...state, purchaseErrorModalOpen: true };
+      return {
+        ...state,
+        alertModal: {
+          type,
+          data: { transaction: payload.transaction },
+        },
+      };
 
     case 'PIXEL_SET_STATE_SUCCESS':
-      return { ...state, purchaseSuccessModalOpen: true };
+      return {
+        ...state,
+        alertModal: {
+          type,
+          data: { transaction: payload.transaction },
+        },
+      };
 
-    case 'PIXEL_SET_STATE_ERROR':
-      return { ...state, purchaseErrorModalOpen: true };
+    case 'SET_ALERT_MODAL':
+      return { ...state, alertModal: payload };
 
-    case 'SET_ERROR_MODAL':
-      return { ...state, errorModal: payload };
+    case 'NETWORK_ID_FETCHED': {
+      if (!payload.supported) {
+        const alertModal = {
+          type: 'UNSUPPORTED_NETWORK',
+          data: payload,
+        };
+
+        return { ...state, alertModal };
+      }
+
+      return state;
+    }
 
     case 'MODAL_DISMISS':
       return initialState;

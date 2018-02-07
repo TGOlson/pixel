@@ -12,12 +12,12 @@ import Dialog, {
 
 
 const TransactionSuccess = (props) => {
-  const { open, onClose, transactionId } = props;
+  const { onClose, transactionId } = props;
 
   // TODO: link to etherscan page
 
   return (
-    <Dialog open={open} onClose={onClose} >
+    <Dialog open onClose={onClose} >
       <DialogTitle style={{ width: '500px' }}>Transaction submitted</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -37,14 +37,9 @@ const TransactionSuccess = (props) => {
   );
 };
 
-TransactionSuccess.defaultProps = {
-  transactionId: null,
-};
-
 TransactionSuccess.propTypes = {
-  open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  transactionId: PropTypes.string,
+  transactionId: PropTypes.string.isRequired,
 };
 
 export default TransactionSuccess;
