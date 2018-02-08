@@ -8,25 +8,9 @@ import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
 import IconButton from 'material-ui/IconButton';
-import MenuIcon from 'material-ui-icons/Menu';
+import MoreVertIcon from 'material-ui-icons/MoreVert';
 
 import PixelToolbar from '../components/PixelToolbar';
-
-const menuIconStyle = {
-  marginLeft: -12,
-  marginRight: 20,
-};
-
-const titleStyle = {
-  flex: 1,
-  textDecoration: 'none',
-};
-
-const LinkToProfile = (address) => {
-  const link = `/profile/${address}`;
-
-  return <Button component={Link} to={link} color="inherit">Profile</Button>;
-};
 
 const isHomePage = path =>
   path === '/' || path.includes('/@');
@@ -62,7 +46,7 @@ const Navbar = (props) => {
   });
 
   const action = address
-    ? LinkToProfile(address)
+    ? <Button component={Link} to={`/account/${address}`} color="inherit">Account</Button>
     : <Button color="inherit">Login</Button>;
 
   const toolbar = isHomePage(props.location.pathname)
@@ -80,17 +64,26 @@ const Navbar = (props) => {
     )
     : null;
 
+  const menuIconStyle = {
+    marginRight: '-12px',
+  };
+
+  const titleStyle = {
+    flex: 1,
+    textDecoration: 'none',
+  };
+
   return (
     <div style={{ width: '100%', zIndex: 2 }}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton style={menuIconStyle} color="inherit" aria-label="Menu">
-            <MenuIcon />
-          </IconButton>
           <Typography type="title" component={Link} to="/" color="inherit" style={titleStyle}>
             Pixel
           </Typography>
           {action}
+          <IconButton style={menuIconStyle} color="inherit">
+            <MoreVertIcon />
+          </IconButton>
         </Toolbar>
         {toolbar}
       </AppBar>

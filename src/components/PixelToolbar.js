@@ -53,19 +53,18 @@ const PixelToolbar = (props) => {
 
   return (
     <Toolbar style={toolbarStyle}>
-      <span style={{ ...itemStyle, textAlign: 'left' }}>{actions}</span>
+      <span style={{ ...itemStyle, textAlign: 'center' }}>{actions}</span>
       <Tabs
         style={itemStyle}
         value={mode}
         onChange={onModeChange}
         indicatorColor="accent"
         textColor="inherit"
-        fullWidth
       >
-        <Tab label="Color" value="Color" />
-        <Tab label="Marketplace" value="Purchase" />
+        <Tab style={{ width: '125px' }} label="Color" value="Color" />
+        <Tab style={{ width: '125px' }} label="Marketplace" value="Purchase" />
       </Tabs>
-      <span style={{ ...itemStyle, textAlign: 'right' }}>
+      <span style={{ ...itemStyle, textAlign: 'center' }}>
         <SettingsMenu
           showGrid={showGrid}
           onShowGridChange={onShowGridChange}

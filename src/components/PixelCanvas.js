@@ -179,9 +179,10 @@ class PixelCanvas extends Component {
       // Note: only re-render the image canvas on transform changes
       // otherwise the changes only impact the interactive canvas
       // and re-rendering would be unnecessary overhead
-      if (!prevProps
-        || this.isTransformChange(prevProps)
-        || this.lastUpdateReceived < this.props.lastUpdateReceived
+      if (
+        !prevProps ||
+        this.isTransformChange(prevProps) ||
+        this.lastUpdateReceived < this.props.lastUpdateReceived
       ) {
         console.log('rendering');
 

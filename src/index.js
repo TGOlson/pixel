@@ -94,7 +94,7 @@ ReactDOM.render(
       <Route path="/" component={App} >
         <IndexRoute component={Home} />
         <Route path="/about" component={About} />
-        <Route path="/profile/:address" component={Profile} />
+        <Route path="/account/:address" component={Profile} />
         <Route path="/pixel/:id" component={PixelDetails} />
         <Route path="/:coords" component={Home} />
       </Route>

@@ -64,7 +64,7 @@ class Home extends Component {
     } = this.props.canvas;
 
     return mode === 'Purchase'
-      ? selected.map(id => [id, '#4486f4ff'])
+      ? selected.map(id => [id, '#ffffff8c'])
       : colored.map(([id, x]) => [id, getHex(x)]);
   }
 
