@@ -24,16 +24,15 @@ web3 todos
 
 todo
 
+* store canvas size in reducer
+* move pixel selection to non-interactive canvas
+* resize canvas on window resize
+* highlight own pixels in color view
 * custom right click/long-press?
   * show pixel
   * show owner
   * purchase/edit if owner
-* show warning if trying to color a pixel not owned by current user
 * show warning if trying to purchase a pixel already owned by current user
-* resize canvas on window resize
-* fix weird edges on interactive canvas
-* display warning if trying to set states of unowned pixels
-* display warning if trying to purchase own pixel
 * undo color toolbar button
 * display total price
 * filter by price

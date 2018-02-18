@@ -21,6 +21,16 @@ const theme = createMuiTheme({
       contrastText: '#000000',
     },
   },
+  overrides: {
+    MuiSwitch: {
+      checked: {
+        color: '#00c853',
+        '& + $bar': {
+          backgroundColor: '#00c853',
+        },
+      },
+    },
+  },
 });
 
 window.theme = theme;

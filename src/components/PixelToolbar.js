@@ -5,18 +5,17 @@ import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
 import FilterListIcon from 'material-ui-icons/FilterList';
 import Tabs, { Tab } from 'material-ui/Tabs';
+import Switch from 'material-ui/Switch';
+import { FormControlLabel } from 'material-ui/Form';
 
 import { PIXEL_COLORS_HEX } from '../util/constants';
 import ColorSelector from './ColorSelector';
-import SettingsMenu from './SettingsMenu';
 
 const PixelToolbar = (props) => {
   const {
     mode,
     showGrid,
     onShowGridChange,
-    showPixelInfo,
-    onShowPixelInfoChange,
     onColorSelectChange,
     selectedColor,
   } = props;
@@ -65,11 +64,14 @@ const PixelToolbar = (props) => {
         <Tab style={{ width: '125px' }} label="Marketplace" value="Purchase" />
       </Tabs>
       <span style={{ ...itemStyle, textAlign: 'center' }}>
-        <SettingsMenu
-          showGrid={showGrid}
-          onShowGridChange={onShowGridChange}
-          showPixelInfo={showPixelInfo}
-          onShowPixelInfoChange={onShowPixelInfoChange}
+        <FormControlLabel
+          control={
+            <Switch
+              checked={showGrid}
+              onChange={() => onShowGridChange(!showGrid)}
+            />
+          }
+          label="Grid"
         />
       </span>
     </Toolbar>
@@ -81,8 +83,6 @@ PixelToolbar.propTypes = {
   onModeChange: PropTypes.func.isRequired,
   showGrid: PropTypes.bool.isRequired,
   onShowGridChange: PropTypes.func.isRequired,
-  showPixelInfo: PropTypes.bool.isRequired,
-  onShowPixelInfoChange: PropTypes.func.isRequired,
   selectedColor: PropTypes.number.isRequired,
   onColorSelectChange: PropTypes.func.isRequired,
 };
