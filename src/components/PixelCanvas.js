@@ -3,7 +3,32 @@ import PropTypes from 'prop-types';
 import { event, select } from 'd3-selection';
 import { zoom } from 'd3-zoom';
 
+import TinyColor from 'tinycolor2';
+
 import { coordsToId, idToCoords } from '../util/pixel';
+
+// Path to non-interactive canvas for pixel modifications
+// options
+//   internal pixel canvas state
+//   * when pixel canvas is initialized, clone original state
+//   * also initialize a modifiable array buffer
+//   * take in modified pixels
+//   * on prop change... diff modified pixels
+//     * might be easy, prevProps.id != nextProps.id
+//   * set modified pixels on mutable array buffer
+//   * reset any pixels that became un-modified
+//
+//  reducer state
+//  * keep original pixel state copy
+//  * make mutable array buffer
+//  * handle change events by setting/unsetting mutable array buffer
+//  * pros
+//    * less for components to manage
+//    * get direct access to events (set/unset)
+//  * cons
+//    * resets (and mode toggles) might be pretty hard
+//
+
 
 class PixelCanvas extends Component {
   constructor(props) {
@@ -14,6 +39,12 @@ class PixelCanvas extends Component {
     // Note: don't use state here. Parts of the render cycle use lifecycle hooks
     // that aren't all compatible with setState.
     this.lastUpdateReceived = null;
+
+    this.originalPixelState = new Uint32Array(props.imageData.data.buffer);
+    this.interactivePixelState = this.originalPixelState.slice();
+
+    const dataArray = new Uint8ClampedArray(this.interactivePixelState.buffer);
+    this.imageData = new ImageData(dataArray, 1000);
   }
 
   componentDidMount() {
@@ -173,28 +204,91 @@ class PixelCanvas extends Component {
     ];
   };
 
+  toMap = (list) => {
+    const map = {};
+
+    list.forEach(([k, v]) => {
+      map[k] = v;
+    });
+
+    return map;
+  }
+
+  updateImageData = (prevProps) => {
+    const prevModifiedPixels = this.toMap(prevProps.modifiedPixels || []);
+    const newModifiedPixels = this.toMap(this.props.modifiedPixels);
+
+    const diffAdded = [];
+    const diffRemoved = [];
+
+    (prevProps.modifiedPixels || []).forEach(([id, hex]) => {
+      if (newModifiedPixels[id] === undefined) {
+        diffRemoved.push([id, hex]);
+      }
+    });
+
+    this.props.modifiedPixels.forEach(([id, hex]) => {
+      if (prevModifiedPixels[id] === undefined) {
+        diffAdded.push([id, hex]);
+      }
+    });
+
+    diffRemoved.forEach(([id, hex]) => {
+      console.log('resetting', id);
+
+      this.interactivePixelState[id] = this.originalPixelState[id];
+    });
+
+    const reverseHex = ([a, b, c, d, e, f, g, h]) => `${g}${h}${e}${f}${c}${d}${a}${b}`;
+
+    diffAdded.forEach(([id, hex]) => {
+      // TODO: this only work for opacity setting
+      // should take in modification spec {type: <color/opacity>}
+
+      const [g, h, e, f, c, d, a, b] = this.originalPixelState[id].toString(16);
+      const hex2 = TinyColor(`#${a}${b}${c}${d}${e}${f}${g}${h}`).lighten(20).toString();
+
+      console.log('setting', id, hex2);
+
+      // const [a, b, c, d, e, f, g, h] = hex2.slice(1);
+      const reversed = reverseHex(hex2.slice(1));
+      // return parseInt(reversed, 16);
+
+      // const [g, h] = hex.slice(7);
+      // const reversed = `${g}${h}${color}`;
+      // // const reversed = `${g}${h}${e}${f}${c}${d}${a}${b}`;
+      //
+      this.interactivePixelState[id] = parseInt(reversed, 16);
+    });
+    // console.log()
+
+    console.log('added', diffAdded, 'removed', diffRemoved);
+  }
+
   renderCanvases = (prevProps) => {
     // TODO: debounce to last?
     window.requestAnimationFrame(() => {
+      this.updateImageData(prevProps || {});
+
       // Note: only re-render the image canvas on transform changes
       // otherwise the changes only impact the interactive canvas
       // and re-rendering would be unnecessary overhead
-      if (
-        !prevProps ||
-        this.isTransformChange(prevProps) ||
-        this.lastUpdateReceived < this.props.lastUpdateReceived
-      ) {
+      // if (
+      //   !prevProps ||
+      //   this.isTransformChange(prevProps) ||
+      //   this.lastUpdateReceived < this.props.lastUpdateReceived
+      // ) {
         console.log('rendering');
 
         this.renderImageCanvas();
 
-        this.lastUpdateReceived = this.props.lastUpdateReceived;
-      }
+      //   this.lastUpdateReceived = this.props.lastUpdateReceived;
+      // }
 
       // Note: always re-ender the interactive canvas
       // it's very low cost, and any prop change should trigger
       // some sort of change on this canvas as well
-      this.renderInteractiveCanvas();
+      // this.renderInteractiveCanvas();
     });
   }
 
@@ -202,7 +296,7 @@ class PixelCanvas extends Component {
     const {
       dimensions: [imageX, imageY],
       transform: { x, y, k },
-      imageData,
+      // imageData,
     } = this.props;
 
     const [viewX, viewY] = this.viewportDimensions();
@@ -213,7 +307,7 @@ class PixelCanvas extends Component {
     // update offscreen canvas
     // TODO: this won't work once async updates are coming in
     // May need to update the offscreen canvas continually
-    this.offscreenContext.putImageData(imageData, 0, 0);
+    this.offscreenContext.putImageData(this.imageData, 0, 0);
 
     // update viewport
     this.imageContext.save();
