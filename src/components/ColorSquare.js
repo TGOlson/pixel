@@ -7,7 +7,7 @@ const ColorSquare = ({ dimension, color }) => (
     height: `${dimension}px`,
     backgroundColor: color,
     borderRadius: '2px',
-    display: 'block',
+    display: 'inline-block',
   }}
   />
 );
