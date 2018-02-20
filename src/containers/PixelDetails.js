@@ -4,9 +4,43 @@ import PropTypes from 'prop-types';
 
 import Typography from 'material-ui/Typography';
 
+import Grid from 'material-ui/Grid';
+import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
+
+import ColorSquare from '../components/ColorSquare';
+
+import { PIXEL_COLORS_HEX } from '../util/constants';
 import { coordsToId } from '../util/pixel';
 
 import { getSetStateEvents, getPriceChangeEvents, getTransferEvents } from '../actions/pixel';
+
+const ColorDisplay = ({ x, y, color }) => {
+  const containerStyle = {
+    position: 'relative',
+    display: 'inline-block',
+  };
+
+  const coordsStyle = {
+    color: '#fafafa',
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    marginRight: '16px',
+  };
+
+  return (
+    <div style={containerStyle}>
+      <ColorSquare dimension={350} color={color} />
+      <Typography type="display3" style={coordsStyle}>{x} x {y}</Typography>
+    </div>
+  );
+};
+
+ColorDisplay.propTypes = {
+  x: PropTypes.number.isRequired,
+  y: PropTypes.number.isRequired,
+  color: PropTypes.string.isRequired,
+};
 
 class PixelDetails extends Component {
   constructor(props) {
@@ -63,21 +97,35 @@ class PixelDetails extends Component {
     ];
 
     // TODO: handle other event types
-    const items = events.map((ev) => {
-      const key = `${ev.blockNumber}_${ev.transactionIndex}_${ev.type}`;
-
-      return <li key={key}>Type {ev.type} Block {ev.blockNumber}. State {ev.args.state}.</li>;
-    });
+    // const items = events.map((ev) => {
+    //   const key = `${ev.blockNumber}_${ev.transactionIndex}_${ev.type}`;
+    //
+    //   return <li key={key}>Type {ev.type} Block {ev.blockNumber}. State {ev.args.state}.</li>;
+    // });
 
     return (
-      <ul>
-        {items}
-      </ul>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Block number</TableCell>
+            <TableCell>Event</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {events.map(ev => (
+            <TableRow key={`${ev.blockNumber}_${ev.transactionIndex}_${ev.type}`}>
+              <TableCell>{ev.blockNumber}</TableCell>
+              <TableCell>Type {ev.type} Block {ev.blockNumber}. State {ev.args.state}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     );
   }
 
   render() {
     const { id, coords } = this.state;
+    const { states } = this.props.pixel;
 
     if (id === null) return <p>Not found!</p>;
 
@@ -86,17 +134,14 @@ class PixelDetails extends Component {
     const [x, y] = coords;
 
     const events = this.renderEvents();
+    const color = PIXEL_COLORS_HEX[states[id]];
 
     return (
-      <div style={{ width: '100%', zIndex: 2 }}>
-        <Typography type="headline" color="inherit">
-          Pixel {x}x{y}
-        </Typography>
-        <Typography type="title" color="inherit">
-          Events
-        </Typography>
+      <Grid style={{ margin: '40px 24px' }}>
+        <ColorDisplay x={x} y={y} color={color} />
+        <Typography type="display3" style={{ marginTop: '40px' }}>Events</Typography>
         {events}
-      </div>
+      </Grid>
     );
   }
 }
@@ -105,6 +150,7 @@ PixelDetails.propTypes = {
   dispatch: PropTypes.func.isRequired,
 
   pixel: PropTypes.shape({
+    states: PropTypes.instanceOf(Uint8ClampedArray),
     stateEventsById: PropTypes.object.isRequired,
     priceEventsById: PropTypes.object.isRequired,
     transferEventsById: PropTypes.object.isRequired,
